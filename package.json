@@ -1,0 +1,21 @@
+{
+  "name": "googlebusinessdata",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "app",
+    "extension",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=app",
+    "build:app": "npm run build --workspace=app",
+    "build:extension": "npm run build --workspace=extension",
+    "build:types": "npm run build --workspace=packages/shared-types",
+    "build": "npm run build:types && npm run build:app && npm run build:extension",
+    "type-check": "tsc --noEmit -p tsconfig.base.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
