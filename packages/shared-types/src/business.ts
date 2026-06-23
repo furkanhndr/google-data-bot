@@ -1,5 +1,5 @@
 export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
-export type JobSource = 'extension' | 'places_api'
+export type JobSource = 'extension' | 'places_api' | 'server'
 export type ExportFormat = 'csv' | 'xlsx'
 
 export interface JobFilters {
@@ -61,6 +61,9 @@ export interface BusinessResult {
   phone_secondary: string | null
   email: string | null
   email_secondary: string | null
+  // Email discovery status (set by website enrichment).
+  // null = not attempted yet.
+  email_status: 'pending' | 'found' | 'not_found' | 'no_website' | null
   website: string | null
 
   // Location

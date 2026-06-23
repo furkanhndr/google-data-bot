@@ -2,12 +2,21 @@ import * as XLSX from 'xlsx'
 import { EXPORT_COLUMNS } from '@/lib/constants'
 import type { BusinessResult } from '@googlebusinessdata/shared-types'
 
+// Human-readable labels for the email enrichment status.
+const EMAIL_STATUS_LABELS: Record<string, string> = {
+  found:      'Bulundu',
+  not_found:  'Bulunamadı',
+  no_website: 'Web sitesi yok',
+  pending:    'Aranıyor',
+}
+
 function flattenRow(r: BusinessResult): Record<string, string | number | boolean | null> {
   return {
     name:                   r.name,
     category:               r.category,
     phone:                  r.phone,
     email:                  r.email,
+    email_status:           r.email_status ? (EMAIL_STATUS_LABELS[r.email_status] ?? r.email_status) : 'Denenmedi',
     website:                r.website,
     address_full:           r.address_full,
     city:                   r.city,
@@ -42,6 +51,7 @@ const COLUMN_HEADERS: Record<string, string> = {
   category:               'Kategori',
   phone:                  'Telefon',
   email:                  'E-posta',
+  email_status:           'E-posta Durumu',
   website:                'Web Site',
   address_full:           'Adres',
   city:                   'Şehir',

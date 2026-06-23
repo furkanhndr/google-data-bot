@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { JobProgressPanel } from '@/components/dashboard/JobProgressPanel'
 import { ResultsTable } from '@/components/dashboard/ResultsTable'
 import { ExportPanel } from '@/components/dashboard/ExportPanel'
+import { EnrichPanel } from '@/components/dashboard/EnrichPanel'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { COLORS, FONT_SIZE } from '@/lib/constants'
 import type { ScrapingJob, BusinessResult } from '@googlebusinessdata/shared-types'
@@ -21,6 +22,18 @@ export default function JobDetailPage() {
   const handleResultsUpdate = useCallback(() => {
     setTotal(prev => prev + 1)
   }, [])
+
+  // Re-fetch results (e.g. after email enrichment updates rows)
+  const reloadResults = useCallback(async () => {
+    const supabase = createClient()
+    const { data } = await supabase
+      .from('business_results')
+      .select('*')
+      .eq('job_id', jobId)
+      .order('scraped_at', { ascending: false })
+      .limit(200)
+    setResults((data ?? []) as BusinessResult[])
+  }, [jobId])
 
   useEffect(() => {
     const supabase = createClient()
@@ -83,9 +96,12 @@ export default function JobDetailPage() {
       {/* Progress panel (Realtime job updates) */}
       <JobProgressPanel initialJob={job} onResultsUpdate={handleResultsUpdate} />
 
-      {/* Export (only shown when completed) */}
+      {/* Email enrichment + Export (only shown when completed) */}
       {job.status === 'completed' && total > 0 && (
-        <ExportPanel jobId={jobId} resultCount={total} />
+        <>
+          <EnrichPanel jobId={jobId} onComplete={reloadResults} />
+          <ExportPanel jobId={jobId} resultCount={total} />
+        </>
       )}
 
       {/* Results table */}

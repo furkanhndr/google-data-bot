@@ -16,9 +16,37 @@ const COLUMNS = [
   { key: 'review_count', label: 'Yorum',         width: '70px' },
 ]
 
+// Hint shown in the email column when no email was found, reflecting why.
+const EMAIL_STATUS_HINT: Record<string, string> = {
+  not_found:  'bulunamadı',
+  no_website: 'web sitesi yok',
+  pending:    'aranıyor…',
+}
+
 function CellValue({ col, row }: { col: string; row: BusinessResult }) {
   const val = (row as unknown as Record<string, unknown>)[col]
+
+  if (col === 'email' && (val == null || val === '')) {
+    const hint = row.email_status ? EMAIL_STATUS_HINT[row.email_status] : undefined
+    return (
+      <span style={{ color: COLORS.textLight, fontSize: FONT_SIZE.xs, fontStyle: 'italic' }}>
+        {hint ?? '—'}
+      </span>
+    )
+  }
+
   if (val == null || val === '') return <span style={{ color: COLORS.textLight }}>—</span>
+
+  if (col === 'email') {
+    return (
+      <a href={`mailto:${String(val)}`}
+        style={{ color: COLORS.primary, fontSize: FONT_SIZE.xs }}
+        onClick={e => e.stopPropagation()}
+      >
+        {String(val)}
+      </a>
+    )
+  }
 
   if (col === 'website' || col === 'maps_url') {
     return (

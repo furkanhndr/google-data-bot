@@ -50,15 +50,23 @@ export function extractCategory(panel: Element): string | null {
 }
 
 export function extractRating(panel: Element): number | null {
+  // Read from the rating block / its aria-label. We parse the first decimal
+  // number out of the text instead of trusting a single element, because some
+  // matching elements exist but are empty (e.g. span.ceNzKf), which would
+  // otherwise shadow the real value.
   const el = q(panel,
+    '[role="img"][aria-label*="yıldız"]',
+    '[role="img"][aria-label*="star"]',
+    'div.F7nice',
     'span.ceNzKf',
-    'div.F7nice span[aria-hidden="true"]',
-    '[aria-label*="yıldız"]',
     '.MW4etd',
   )
   if (!el) return null
-  const val = parseFloat(text(el)?.replace(',', '.') ?? '')
-  return isNaN(val) ? null : val
+  const source = el.getAttribute('aria-label') ?? text(el) ?? ''
+  const match = source.match(/(\d+[.,]\d+)/)
+  if (!match) return null
+  const val = parseFloat(match[1].replace(',', '.'))
+  return isNaN(val) || val < 0 || val > 5 ? null : val
 }
 
 export function extractReviewCount(panel: Element): number | null {
@@ -75,22 +83,29 @@ export function extractReviewCount(panel: Element): number | null {
 }
 
 export function extractPhone(panel: Element): string | null {
-  // Look for elements with phone aria-label or data-tooltip containing phone patterns
-  const candidates = qAll(panel,
-    '[data-tooltip*="Telefon"]',
-    '[aria-label*="Telefon"]',
-    '[aria-label*="Phone"]',
-    '[data-item-id*="phone"]',
+  // Google exposes the phone on a dedicated action button. The aria-label
+  // ("Telefon: 0533 966 53 69") is the cleanest source; data-item-id
+  // ("phone:tel:05339665369") is the fallback. We deliberately do NOT scan
+  // the whole panel for digit runs — that produced false positives from
+  // plus codes, coordinates and review counts.
+  const btn = q(panel,
+    '[data-item-id^="phone"]',
+    'button[data-item-id*="phone"]',
+    '[aria-label^="Telefon:"]',
+    '[aria-label^="Phone:"]',
   )
-  for (const c of candidates) {
-    const t = text(c)
-    if (t && /^[\+\d\s\(\)\-]{7,}$/.test(t)) return t
+  if (!btn) return null
+
+  const aria = attr(btn, 'aria-label')
+  if (aria && /\d/.test(aria)) {
+    const cleaned = aria.split(':').slice(1).join(':').trim()
+    if (cleaned) return cleaned
   }
 
-  // Fallback: scan all text for phone-like patterns
-  const allText = panel.textContent ?? ''
-  const match = allText.match(/(\+?[\d\s\(\)\-]{10,15})/)
-  return match ? match[1].trim() : null
+  const tel = attr(btn, 'data-item-id')?.match(/tel:(.+)$/)?.[1]
+  if (tel) return tel
+
+  return text(btn)
 }
 
 export function extractWebsite(panel: Element): string | null {

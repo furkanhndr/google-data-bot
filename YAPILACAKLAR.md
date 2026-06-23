@@ -1,0 +1,126 @@
+# Yapılacaklar & Kritik Maddeler
+
+> Bu dosya, projenin üretime (production) hazır hale gelmesi için gereken
+> işleri öncelik sırasına göre listeler. Senior kod incelemesi sonucu çıkan
+> bulgulara dayanır. İşaretleme: 🔴 bloklayıcı · 🟡 önemli · 🟢 iyileştirme.
+
+> **🔀 Mimari karar:** Scraping artık tarayıcı eklentisinde değil, **harici
+> backend servisinde** (`scraper-service/`, Playwright) çalışıyor. Bu, Chrome
+> Web Store onayı ve kullanıcı Google hesabının banlanma riskini ortadan
+> kaldırır. Eklentinin scraping akışı ([scraper.ts](extension/src/content/scraper.ts))
+> artık kullanılmıyor; sadece [extractor.ts](extension/src/content/extractor.ts)
+> ortak kaynak olarak korunuyor.
+
+---
+
+## 🔴 Bloklayıcı — bunlar olmadan canlıya çıkılmaz
+
+### 1. Proxy altyapısı (harici scraping ölçeği)
+- **Sorun:** Harici servis tek IP'den çok istek atınca Google datacenter
+  IP'lerini hızla engeller. Canlı testte bu doğrulandı (headless'ta detay
+  paneli boş/degrade geldi).
+- **Yapılacak:**
+  - Rotating **residential proxy** entegre et (servis `PROXY_SERVER` ile hazır).
+  - Anti-detection'ı sertleştir: `playwright-extra` + stealth, gerçekçi
+    gecikme/hareket. Servis şu an sadece `navigator.webdriver` gizliyor.
+
+### 2. Hukuki zemin
+- **Sorun:** Google Maps scraping Google ToS'una aykırı (Chrome Web Store riski
+  harici servise geçince ortadan kalktı, ama scraping'in kendisi hâlâ ToS dışı).
+- **Yapılacak:** Kullanım koşulları + risk uyarısı; ölçek hedefine göre resmi
+  Places API yolunu değerlendir.
+
+### 3. Servis canlı doğrulama
+- **Yapılacak:** `scraper-service`'i gerçek Supabase kimlik bilgileri + proxy ile
+  uçtan uca test et (job oluştur → işlensin → sonuçlar DB'ye yazılsın).
+  Çekirdek çıkarım akışı kanıtlandı; DB/worker bağlantısı henüz canlı denenmedi.
+
+---
+
+## 🟡 Önemli — kısa vadede yapılmalı
+
+### 4. Test ve CI yokluğu
+- Kredi/faturalandırma mantığı, RLS politikaları ve `extractor` için **hiç test yok**.
+- **Yapılacak:**
+  - `extractor.ts` için sabit HTML fixture'larıyla birim testleri.
+  - RLS politikaları için entegrasyon testleri (yetki sızıntısı kontrolü).
+  - Faturalandırma akışı için test.
+  - GitHub Actions: `type-check` + test + build.
+
+### 5. Extractor kırılganlığı (sağlık izleme)
+- **Sorun:** [extractor.ts](extension/src/content/extractor.ts) Google'ın obfuscate
+  edilmiş class'larına bağlı (`.DUwDvf`, `.qBF1Pd`). Google bunları sık değiştirir;
+  bozulduğunda sessizce boş veri toplanır.
+- **Yapılacak:** "Beklenen alan doluluk oranı X'in altına düştü" alarmı / metriği.
+  En azından iş başına `name` + `address` doluluk yüzdesini logla.
+
+### 6. Export ölçeklenebilirliği
+- **Sorun:** [export/route.ts](app/app/api/jobs/[jobId]/export/route.ts#L36) tüm
+  satırları belleğe çekip serverless'ta XLSX üretiyor → 5000 satırda timeout/memory
+  riski. Bucket yoksa fallback dosya dönüyor ama `export_history`'ye yazmıyor.
+- **Yapılacak:** Büyük export'ları stream'le veya arka plan işine taşı; fallback
+  yolunda da geçmişi kaydet.
+
+### 7. E-posta zenginleştirme — ölçek (bkz. ✅ Tamamlanan)
+- Mevcut tasarım MVP olarak çalışıyor ama büyük işlerde dış sitelere çok istek atar.
+- **Yapılacak:** Gerçek ölçekte arka plan kuyruğu (Supabase Edge Function / cron
+  worker) + proxy havuzu + IP rate-limit yönetimi.
+
+### 8. Auth modeli tutarlılığı
+- **Sorun:** [validate-session](app/app/api/extension/validate-session/route.ts)
+  cookie tabanlı `createClient()` kullanıyor ama eklenti bearer token ile çalışıyor.
+- **Yapılacak:** Endpoint'i bearer token'ı doğrulayacak şekilde düzelt veya kaldır.
+
+---
+
+## 🟢 İyileştirmeler
+
+- **10.** Premium `credits_total` DB'de 100 kalıyor ama kod plan kontrolüyle baypas
+  ediyor — tek doğruluk kaynağına indir.
+- **11.** Ölü scaffolding: `places_api_quota` tablosu ve `source: 'places_api'`
+  enum'u implemente edilmemiş — ya tamamla ya temizle.
+- **12.** Kök dizinde proje README'si yok — kurulum/onboarding dokümanı ekle.
+- **13.** Servis: tek tarayıcı örneği `jobConcurrency` job'ı paylaşıyor; ölçekte
+  context/sayfa havuzu sınırı ve job başına timeout ekle.
+
+---
+
+## ✅ Tamamlanan
+
+### Harici scraper servisi (`scraper-service/`)
+Scraping eklentiden backend'e taşındı. Playwright ile arama → işletme
+URL'lerini toplama → **doğrudan navigasyon** → ortak extractor ile çıkarım →
+service-role ile DB'ye yazım.
+- Atomik job sahiplenme (worker'lar aynı işi almaz), `jobConcurrency`, polling.
+- **Faturalandırma düzeltildi:** `scraped_count` artık **gerçekten yazılan**
+  satır sayısı; insert hatası işi `failed` yapar (eski sessiz veri kaybı yok).
+- Extractor tek kaynaktan derlenip enjekte ediliyor
+  ([build-extractor.mjs](scraper-service/scripts/build-extractor.mjs)).
+- Proxy desteği (`PROXY_SERVER`), Dockerfile, `source = 'server'`
+  ([migration 006](supabase/migrations/20240001_006_server_source.sql)).
+
+### Extractor bug düzeltmeleri (canlı doğrulandı)
+- **Puan (rating):** boş `span.ceNzKf` gerçek değeri gölgeliyordu → %0'dan %100'e.
+- **Telefon:** tehlikeli "tüm metni tara" fallback'i `06091215182100` gibi çöp
+  üretiyordu → kaldırıldı, artık sadece `data-item-id="phone"`/aria-label.
+- Canlı test (Kadıköy kafeler): name/category/address/review_count %100,
+  rating %100, phone doğru (sahte yok).
+
+### E-posta zenginleştirme (Seçenek A)
+Google Maps e-posta vermediği için, toplanan `website` alanından işletmenin
+kendi sitesi taranarak e-posta çıkarılıyor.
+
+- **DB:** `business_results.email_status` kolonu
+  ([migration 005](supabase/migrations/20240001_005_email_enrichment.sql)).
+- **Motor:** [email-enrich.ts](app/lib/utils/email-enrich.ts) — ana sayfa +
+  iletişim sayfaları taraması, `mailto:` + regex, sahte adres filtresi,
+  rol-adresi önceliği, sınırlı paralellik.
+- **API:** [enrich/route.ts](app/app/api/jobs/[jobId]/enrich/route.ts) —
+  batch'li (40) + paralel (5), sahiplik kontrollü, ilerleme döndürür.
+- **UI:** [EnrichPanel.tsx](app/components/dashboard/EnrichPanel.tsx) ile
+  "E-postaları bul" butonu (döngüsel batch), tabloda `mailto:` linki + durum rozeti.
+- **Export:** CSV/XLSX'e "E-posta Durumu" kolonu eklendi.
+
+> ⚠️ **Beklenti notu:** Web sitesi olan işletmelerde tipik yakalama oranı
+> **%30–60**. İletişim formu kullananlarda e-posta çıkmaz. Bu, müşteriye
+> şeffaf şekilde iletilmeli.

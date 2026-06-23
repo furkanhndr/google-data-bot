@@ -10,6 +10,7 @@ Supabase Dashboard → SQL Editor'da aşağıdaki sırayla çalıştır:
 | 2 | `migrations/20240001_002_rls.sql` | RLS etkinleştirme + politikalar |
 | 3 | `migrations/20240001_003_triggers.sql` | Trigger'lar + RPC fonksiyonları |
 | 4 | `migrations/20240001_004_storage.sql` | Storage bucket politikaları |
+| 5 | `migrations/20240001_005_email_enrichment.sql` | `email_status` kolonu (web sitesinden e-posta zenginleştirme) |
 
 ## Storage Bucket'larını Manuel Oluşturma
 

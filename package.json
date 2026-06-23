@@ -5,6 +5,7 @@
   "workspaces": [
     "app",
     "extension",
+    "scraper-service",
     "packages/*"
   ],
   "scripts": {
@@ -13,6 +14,7 @@
     "build:extension": "npm run build --workspace=extension",
     "build:types": "npm run build --workspace=packages/shared-types",
     "build": "npm run build:types && npm run build:app && npm run build:extension",
+    "scraper": "npm run start --workspace=@googlebusinessdata/scraper-service",
     "type-check": "tsc --noEmit -p tsconfig.base.json"
   },
   "devDependencies": {

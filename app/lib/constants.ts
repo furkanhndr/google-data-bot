@@ -70,9 +70,15 @@ export const MAX_RESULTS_PREMIUM = 5000
 // ── Export ───────────────────────────────────────────────────
 export const EXPORT_SIGNED_URL_EXPIRY = 60 * 60 // 1 hour in seconds
 
+// ── Email enrichment ─────────────────────────────────────────
+// Bounded per-request so a single serverless invocation never times out.
+// The dashboard calls the endpoint repeatedly until `remaining` reaches 0.
+export const ENRICH_BATCH_SIZE  = 40   // websites crawled per API request
+export const ENRICH_CONCURRENCY = 5    // simultaneous site fetches
+
 // ── Business result fields (for export column ordering) ──────
 export const EXPORT_COLUMNS = [
-  'name', 'category', 'phone', 'email', 'website',
+  'name', 'category', 'phone', 'email', 'email_status', 'website',
   'address_full', 'city', 'state', 'country', 'postal_code',
   'rating', 'review_count', 'price_level',
   'social_facebook', 'social_instagram', 'social_twitter',
