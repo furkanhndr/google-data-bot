@@ -1,0 +1,13 @@
+{
+  "name": "@googlebusinessdata/shared-utils",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/email-enrich.ts",
+  "types": "./src/email-enrich.ts",
+  "scripts": {
+    "build": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

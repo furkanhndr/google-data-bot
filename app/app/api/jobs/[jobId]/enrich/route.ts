@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { ENRICH_BATCH_SIZE, ENRICH_CONCURRENCY } from '@/lib/constants'
-import { findEmailForWebsite, mapWithConcurrency } from '@/lib/utils/email-enrich'
+import { findEmailForWebsite, mapWithConcurrency } from '@googlebusinessdata/shared-utils'
 
 type Params = { params: Promise<{ jobId: string }> }
 

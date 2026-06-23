@@ -1,6 +1,8 @@
 // Website-based email enrichment.
 // Google Maps never exposes business emails, but most businesses link their
 // own website. We fetch a few likely contact pages and extract an email.
+// Shared by the Next.js app (on-demand endpoint) and the scraper service
+// (automatic post-scrape enrichment).
 
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
 
@@ -42,9 +44,11 @@ function pickBest(emails: string[]): string {
 }
 
 function extractFromHtml(html: string): string | null {
-  // mailto: links are the most reliable signal.
-  const mailtos = [...html.matchAll(/mailto:([^"'?>\s]+)/gi)]
-    .map(m => decodeURIComponent(m[1]))
+  // mailto: links are the most reliable signal. Exclude '<' in the capture and
+  // re-match against EMAIL_RE so trailing junk (e.g. "addr@x.com<br>") is stripped.
+  const mailtos = [...html.matchAll(/mailto:([^"'?<>\s]+)/gi)]
+    .map(m => decodeURIComponent(m[1]).match(EMAIL_RE)?.[0] ?? '')
+    .filter(Boolean)
     .filter(isValidEmail)
   if (mailtos.length) return pickBest(mailtos)
 

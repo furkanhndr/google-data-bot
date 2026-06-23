@@ -1,4 +1,5 @@
 import type { ScrapingJob } from '@googlebusinessdata/shared-types'
+import { findEmailForWebsite, mapWithConcurrency } from '@googlebusinessdata/shared-utils'
 import { supabase } from './supabase.ts'
 import { scrape } from './scraper.ts'
 import { config } from './config.ts'
@@ -48,6 +49,8 @@ export async function processJob(job: ScrapingJob): Promise<void> {
       query: job.query,
       location: job.location,
       maxResults,
+      category: job.filters?.category ?? null,
+      minRating: job.filters?.min_rating ?? null,
       isCancelled: () => isCancelled(job.id),
       onBatch: async (rows) => {
         const payload = rows.map(r => ({ ...r, job_id: job.id, user_id: job.user_id }))
@@ -73,6 +76,15 @@ export async function processJob(job: ScrapingJob): Promise<void> {
     }).eq('id', job.id)
 
     console.log(`[worker] job ${job.id} done — ${insertedTotal} results`)
+
+    // Automatic website email enrichment (best-effort; never fails the job).
+    if (config.autoEnrich) {
+      try {
+        await enrichJobEmails(job.id)
+      } catch (e) {
+        console.error(`[worker] job ${job.id} enrichment error:`, e instanceof Error ? e.message : e)
+      }
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     await supabase.from('scraping_jobs').update({
@@ -82,6 +94,30 @@ export async function processJob(job: ScrapingJob): Promise<void> {
     }).eq('id', job.id)
     console.error(`[worker] job ${job.id} failed:`, message)
   }
+}
+
+// Crawls business websites to discover emails, writing email + email_status.
+async function enrichJobEmails(jobId: string): Promise<void> {
+  // Flag rows with no website so they aren't reconsidered.
+  await supabase.from('business_results')
+    .update({ email_status: 'no_website' })
+    .eq('job_id', jobId).is('email_status', null).is('website', null)
+
+  const { data: rows } = await supabase.from('business_results')
+    .select('id, website')
+    .eq('job_id', jobId).is('email_status', null).not('website', 'is', null)
+  if (!rows || rows.length === 0) return
+
+  let found = 0
+  await mapWithConcurrency(rows, config.enrichConcurrency, async (row) => {
+    const outcome = await findEmailForWebsite(row.website as string)
+    const update = outcome.status === 'found'
+      ? { email: outcome.email, email_status: 'found' as const }
+      : { email_status: 'not_found' as const }
+    if (outcome.status === 'found') found++
+    await supabase.from('business_results').update(update).eq('id', row.id)
+  })
+  console.log(`[worker] job ${jobId} enrichment — ${found}/${rows.length} emails found`)
 }
 
 // Continuously claims and processes jobs, up to `jobConcurrency` at a time.

@@ -13,7 +13,7 @@ for (const key of REQUIRED_ENV) {
 }
 
 const nextConfig = {
-  transpilePackages: ['@googlebusinessdata/shared-types'],
+  transpilePackages: ['@googlebusinessdata/shared-types', '@googlebusinessdata/shared-utils'],
   images: {
     remotePatterns: [
       {

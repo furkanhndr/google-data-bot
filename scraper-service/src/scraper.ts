@@ -13,9 +13,20 @@ export interface ScrapeOptions {
   query: string
   location: string
   maxResults: number
+  category?: string | null
+  minRating?: number | null
   // Called as rows are extracted so the caller can stream them to the DB.
   onBatch: (rows: Partial<BusinessResult>[]) => Promise<void>
   isCancelled?: () => Promise<boolean>
+}
+
+// Builds the Google Maps search term from query + optional category + location,
+// avoiding duplicate words (e.g. query already contains the category).
+function buildSearchTerm(query: string, category: string | null | undefined, location: string): string {
+  const parts = [query]
+  if (category && !query.toLowerCase().includes(category.toLowerCase())) parts.push(category)
+  parts.push(location)
+  return parts.join(' ').trim()
 }
 
 let browserSingleton: Browser | null = null
@@ -50,7 +61,7 @@ async function newContext(browser: Browser): Promise<BrowserContext> {
 // Runs one search and extracts business detail by navigating directly to each
 // place URL (far more reliable than clicking cards in the results feed).
 export async function scrape(opts: ScrapeOptions): Promise<number> {
-  const { query, location, maxResults, onBatch, isCancelled } = opts
+  const { query, location, maxResults, category, minRating, onBatch, isCancelled } = opts
   const browser = await getBrowser()
   const ctx = await newContext(browser)
   const page = await ctx.newPage()
@@ -59,7 +70,7 @@ export async function scrape(opts: ScrapeOptions): Promise<number> {
   const batch: Partial<BusinessResult>[] = []
 
   try {
-    const searchTerm = `${query} ${location}`.trim()
+    const searchTerm = buildSearchTerm(query, category, location)
     await page.goto(
       `https://www.google.com/maps/search/${encodeURIComponent(searchTerm)}?hl=tr`,
       { waitUntil: 'domcontentloaded', timeout: 45000 },
@@ -112,7 +123,8 @@ export async function scrape(opts: ScrapeOptions): Promise<number> {
           return g.__extract(panel)
         })) as Partial<BusinessResult>
 
-        if (data?.name && data.name !== 'Bilinmiyor') {
+        const passesRating = !minRating || (data?.rating != null && data.rating >= minRating)
+        if (data?.name && data.name !== 'Bilinmiyor' && passesRating) {
           batch.push(data)
           scraped++
           if (batch.length >= config.insertBatchSize) {

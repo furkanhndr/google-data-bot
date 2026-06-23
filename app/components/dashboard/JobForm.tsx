@@ -51,7 +51,7 @@ export function JobForm() {
       return
     }
 
-    toast('İş oluşturuldu! Extension ile scraping başlatabilirsiniz.', 'success')
+    toast('İş oluşturuldu! Veri toplama otomatik başlayacak.', 'success')
     router.push(`/dashboard/jobs/${data.job.id}`)
   }
 
@@ -169,8 +169,8 @@ export function JobForm() {
         }}>
           <span>ℹ</span>
           <span>
-            İş oluşturduktan sonra Chrome Extension ile Google Maps sekmesini açık tutarak scraping başlatın.
-            Sonuçlar bu sayfaya otomatik yansıyacak.
+            İş oluşturulduktan sonra veri toplama sunucuda otomatik başlar.
+            Sonuçlar bu sayfaya canlı olarak yansıyacak.
           </span>
         </div>
 

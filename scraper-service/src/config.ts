@@ -19,4 +19,8 @@ export const config = {
 
   // How many result rows to insert per DB call.
   insertBatchSize: 20,
+
+  // Run website email enrichment automatically after a job completes.
+  autoEnrich:       (process.env.AUTO_ENRICH ?? 'true') !== 'false',
+  enrichConcurrency: Number(process.env.ENRICH_CONCURRENCY ?? 5),
 } as const

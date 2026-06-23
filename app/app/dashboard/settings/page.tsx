@@ -65,7 +65,7 @@ export default async function SettingsPage() {
               }} />
             </div>
             <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted, marginTop: '6px' }}>
-              {profile?.credits_total ?? 100 - (profile?.credits_used ?? 0)} kredi kaldı
+              {Math.max(0, (profile?.credits_total ?? 100) - (profile?.credits_used ?? 0))} kredi kaldı
             </div>
           </div>
         </div>
