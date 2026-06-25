@@ -18,8 +18,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Authenticated + auth page → redirect to dashboard
-  if (isAuth && user && !pathname.startsWith('/auth/callback')) {
+  // Authenticated + auth page → redirect to dashboard.
+  // Exception: the password-recovery session is authenticated but must be
+  // allowed to reach the reset page to set a new password.
+  if (isAuth && user
+      && !pathname.startsWith('/auth/callback')
+      && !pathname.startsWith('/auth/reset-password')) {
     const dashboardUrl = request.nextUrl.clone()
     dashboardUrl.pathname = '/dashboard'
     return NextResponse.redirect(dashboardUrl)

@@ -3,11 +3,13 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { JobNotifier } from '@/components/layout/JobNotifier'
 import { COLORS, FONT_SIZE } from '@/lib/constants'
 import type { ReactNode } from 'react'
 import type { UserProfile } from '@googlebusinessdata/shared-types'
 
 const NAV_ITEMS = [
+  { href: '/dashboard',          label: 'Genel Bakış', icon: '📊', exact: true },
   { href: '/dashboard/jobs',     label: 'İşler',      icon: '⚡' },
   { href: '/dashboard/exports',  label: 'Dışa Aktarma', icon: '📤' },
   { href: '/dashboard/settings', label: 'Ayarlar',    icon: '⚙' },
@@ -33,6 +35,9 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: COLORS.bg }}>
+      {/* Live job completion notifications */}
+      <JobNotifier userId={profile.id} />
+
       {/* Sidebar */}
       <aside style={{
         width: '240px',
@@ -64,7 +69,7 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
         {/* Nav */}
         <nav style={{ flex: 1, padding: '12px 0' }}>
           {NAV_ITEMS.map(item => {
-            const active = pathname.startsWith(item.href)
+            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
             return (
               <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
                 <div style={{

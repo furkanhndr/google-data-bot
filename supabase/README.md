@@ -11,6 +11,8 @@ Supabase Dashboard → SQL Editor'da aşağıdaki sırayla çalıştır:
 | 3 | `migrations/20240001_003_triggers.sql` | Trigger'lar + RPC fonksiyonları |
 | 4 | `migrations/20240001_004_storage.sql` | Storage bucket politikaları |
 | 5 | `migrations/20240001_005_email_enrichment.sql` | `email_status` kolonu (web sitesinden e-posta zenginleştirme) |
+| 6 | `migrations/20240001_006_server_source.sql` | `source='server'` (harici scraper servisi) |
+| 7 | `migrations/20240001_007_realtime.sql` | Realtime publication (canlı sonuç + bildirim) |
 
 ## Storage Bucket'larını Manuel Oluşturma
 

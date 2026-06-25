@@ -37,6 +37,25 @@
 
 ---
 
+## 🚀 Deploy / Yapılandırma notları
+
+Canlıya alırken yapılması gerekenler (kod hazır, sadece yapılandırma):
+
+1. **Şifre sıfırlama e-postası — SMTP gerekir.** `resetPasswordForEmail` ve
+   kayıt onayı e-postaları Supabase'in varsayılan e-posta servisini kullanır;
+   bu servis **düşük rate-limitli, sadece test için**. Üretimde Supabase →
+   **Authentication → Emails → SMTP Settings**'ten kendi SMTP'ni (örn. Resend,
+   Postmark) bağla.
+2. **Auth redirect URL'leri.** Supabase → **Authentication → URL Configuration**:
+   - **Site URL**: prod domain
+   - **Redirect URLs**: `https://<domain>/auth/callback` (şifre sıfırlama linki
+     `/auth/callback?redirectTo=/auth/reset-password` adresine döner).
+3. **E-posta onayı (opsiyonel).** Kayıt sonrası anında giriş istiyorsan
+   Authentication → Providers → Email → "Confirm email" kapatılabilir
+   (güvenlik tercihi).
+
+---
+
 ## 🟡 Önemli — kısa vadede yapılmalı
 
 ### 4. Test ve CI yokluğu
@@ -86,6 +105,26 @@
 ---
 
 ## ✅ Tamamlanan
+
+### Dashboard genel bakış + bildirimler
+- **Genel Bakış sayfası** ([dashboard/page.tsx](app/app/dashboard/page.tsx)) —
+  istatistik kartları (toplam/tamamlanan iş, toplam sonuç, kalan kredi),
+  son 7 gün aktivite grafiği, son işler listesi. Sidebar'a eklendi.
+- **İş tamamlandı bildirimi** ([JobNotifier](app/components/layout/JobNotifier.tsx)) —
+  Supabase Realtime ile iş `completed`/`failed` olunca in-app toast.
+- **Realtime etkinleştirildi** ([migration 007](supabase/migrations/20240001_007_realtime.sql)) —
+  `scraping_jobs` + `business_results` publication'a eklendi (canlı sonuç akışı da bundan faydalanır).
+
+### Hesap yönetimi (kullanıcı paneli)
+- **Profil düzenleme + avatar** ([ProfileSettings](app/components/settings/ProfileSettings.tsx)) —
+  ad değiştirme, foto yükleme (`avatars` bucket, 2 MB).
+- **Şifre değiştirme** ([PasswordSettings](app/components/settings/PasswordSettings.tsx)).
+- **Hesap silme** ([DangerZone](app/components/settings/DangerZone.tsx) +
+  [api/account](app/app/api/account/route.ts)) — "SİL" onayı, service-role, cascade.
+- **Şifremi unuttum + sıfırlama** ([forgot-password](app/app/auth/forgot-password/page.tsx),
+  [reset-password](app/app/auth/reset-password/page.tsx)) + middleware muafiyeti + login linki.
+- Doğrulandı: profil güncelleme RLS altında çalışır, `is_suspended` yükseltme 403.
+- ⚠️ E-posta gönderimi için SMTP gerekir (bkz. Deploy notları).
 
 ### Harici scraper servisi (`scraper-service/`)
 Scraping eklentiden backend'e taşındı. Playwright ile arama → işletme

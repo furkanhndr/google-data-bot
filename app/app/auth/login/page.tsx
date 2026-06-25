@@ -66,7 +66,12 @@ export default function LoginPage() {
         </div>
 
         <div style={{ marginBottom: '24px' }}>
-          <label style={labelStyle}>Şifre</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <label style={labelStyle}>Şifre</label>
+            <Link href="/auth/forgot-password" style={{ fontSize: FONT_SIZE.xs, color: COLORS.primary, textDecoration: 'none' }}>
+              Şifremi unuttum?
+            </Link>
+          </div>
           <input
             type="password"
             value={password}

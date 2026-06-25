@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { ProfileSettings } from '@/components/settings/ProfileSettings'
+import { PasswordSettings } from '@/components/settings/PasswordSettings'
+import { DangerZone } from '@/components/settings/DangerZone'
 import { COLORS, FONT_SIZE } from '@/lib/constants'
 
 export default async function SettingsPage() {
@@ -18,25 +21,24 @@ export default async function SettingsPage() {
     : 0
 
   return (
-    <div style={{ padding: '32px', maxWidth: '600px' }}>
+    <div style={{ padding: '32px', maxWidth: '640px' }}>
       <h1 style={{ margin: '0 0 24px', fontSize: FONT_SIZE['2xl'], fontWeight: '700', color: COLORS.text }}>
         Hesap Ayarları
       </h1>
 
-      {/* Profile card */}
-      <Card style={{ marginBottom: '16px' }}>
-        <h2 style={{ margin: '0 0 20px', fontSize: FONT_SIZE.lg, fontWeight: '600', color: COLORS.text }}>
-          Profil Bilgileri
-        </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <Row label="E-posta" value={user?.email ?? '—'} />
-          <Row label="Ad Soyad" value={profile?.display_name ?? '—'} />
-          <Row label="Üyelik tarihi" value={profile ? new Intl.DateTimeFormat('tr-TR').format(new Date(profile.created_at)) : '—'} />
-        </div>
-      </Card>
+      {/* Editable profile + avatar */}
+      <ProfileSettings
+        userId={user!.id}
+        email={user?.email ?? ''}
+        initialName={profile?.display_name ?? ''}
+        initialAvatar={profile?.avatar_url ?? null}
+      />
 
-      {/* Plan & credits card */}
-      <Card>
+      {/* Change password */}
+      <PasswordSettings />
+
+      {/* Plan & credits (read-only) */}
+      <Card style={{ marginBottom: '16px' }}>
         <h2 style={{ margin: '0 0 20px', fontSize: FONT_SIZE.lg, fontWeight: '600', color: COLORS.text }}>
           Plan & Krediler
         </h2>
@@ -70,15 +72,9 @@ export default async function SettingsPage() {
           </div>
         </div>
       </Card>
-    </div>
-  )
-}
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <span style={{ fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>{label}</span>
-      <span style={{ fontSize: FONT_SIZE.sm, color: COLORS.text, fontWeight: '500' }}>{value}</span>
+      {/* Delete account */}
+      <DangerZone />
     </div>
   )
 }
