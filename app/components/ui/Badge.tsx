@@ -1,14 +1,13 @@
-import { COLORS, FONT_SIZE, RADIUS } from '@/lib/constants'
 import type { ReactNode } from 'react'
 
 type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info'
 
-const variantMap: Record<BadgeVariant, { bg: string; color: string }> = {
-  default: { bg: COLORS.bg,           color: COLORS.textMuted },
-  success: { bg: COLORS.successLight,  color: COLORS.success },
-  warning: { bg: COLORS.warningLight,  color: COLORS.warning },
-  danger:  { bg: COLORS.dangerLight,   color: COLORS.danger },
-  info:    { bg: COLORS.primaryLight,  color: COLORS.primary },
+const variantClasses: Record<BadgeVariant, string> = {
+  default: 'bg-gray-50 text-textMuted',
+  success: 'bg-green-50 text-green-700',
+  warning: 'bg-yellow-50 text-yellow-700',
+  danger:  'bg-red-50 text-danger',
+  info:    'bg-blue-50 text-primary',
 }
 
 interface BadgeProps {
@@ -17,19 +16,10 @@ interface BadgeProps {
 }
 
 export function Badge({ variant = 'default', children }: BadgeProps) {
-  const { bg, color } = variantMap[variant]
   return (
-    <span style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      padding: '2px 8px',
-      borderRadius: RADIUS.full,
-      fontSize: FONT_SIZE.xs,
-      fontWeight: '500',
-      backgroundColor: bg,
-      color,
-      whiteSpace: 'nowrap',
-    }}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+      variantClasses[variant]
+    }`}>
       {children}
     </span>
   )

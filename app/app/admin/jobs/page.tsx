@@ -1,7 +1,6 @@
 import { createServiceClient } from '@/lib/supabase/server'
 import { JobStatusBadge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat('tr-TR', {
@@ -23,57 +22,52 @@ export default async function AdminJobsPage() {
   const emailMap = new Map((authUsers?.users ?? []).map(u => [u.id, u.email]))
 
   return (
-    <div style={{ padding: '32px' }}>
-      <h1 style={{ margin: '0 0 8px', fontSize: FONT_SIZE['2xl'], fontWeight: '700', color: COLORS.text }}>
+    <div className="p-8">
+      <h1 className="mb-2 text-2xl font-bold text-text">
         Tüm İşler
       </h1>
-      <p style={{ margin: '0 0 24px', fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>
+      <p className="mb-6 text-sm text-textMuted">
         {jobs?.length ?? 0} iş gösteriliyor (son 100)
       </p>
 
       <Card padding="0">
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: FONT_SIZE.sm }}>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
             <thead>
-              <tr style={{ backgroundColor: COLORS.bg }}>
+              <tr className="bg-bg">
                 {['Kullanıcı', 'Sorgu', 'Konum', 'Durum', 'Sonuç', 'Kaynak', 'Tarih'].map(h => (
-                  <th key={h} style={{
-                    padding: '10px 14px', textAlign: 'left',
-                    fontWeight: '600', color: COLORS.textMuted,
-                    borderBottom: `2px solid ${COLORS.border}`,
-                    whiteSpace: 'nowrap',
-                  }}>{h}</th>
+                  <th key={h} className="px-3.5 py-2.5 text-left font-semibold text-textMuted border-b-2 border-border whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {(jobs ?? []).length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '40px', textAlign: 'center', color: COLORS.textMuted }}>
+                  <td colSpan={7} className="p-10 text-center text-textMuted">
                     Henüz iş yok.
                   </td>
                 </tr>
               ) : (jobs ?? []).map(job => (
-                <tr key={job.id} style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-                  <td style={{ padding: '10px 14px', color: COLORS.textMuted, fontSize: FONT_SIZE.xs }}>
+                <tr key={job.id} className="border-b border-border">
+                  <td className="px-3.5 py-2.5 text-textMuted text-xs">
                     {emailMap.get(job.user_id) ?? job.user_id.slice(0, 8) + '...'}
                   </td>
-                  <td style={{ padding: '10px 14px', fontWeight: '500', color: COLORS.text, maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <td className="px-3.5 py-2.5 font-medium text-text max-w-[160px] overflow-hidden overflow-ellipsis whitespace-nowrap">
                     {job.query}
                   </td>
-                  <td style={{ padding: '10px 14px', color: COLORS.textMuted, maxWidth: '130px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <td className="px-3.5 py-2.5 text-textMuted max-w-[130px] overflow-hidden overflow-ellipsis whitespace-nowrap">
                     {job.location}
                   </td>
-                  <td style={{ padding: '10px 14px' }}>
+                  <td className="px-3.5 py-2.5">
                     <JobStatusBadge status={job.status} />
                   </td>
-                  <td style={{ padding: '10px 14px', fontWeight: '600', color: COLORS.text }}>
+                  <td className="px-3.5 py-2.5 font-semibold text-text">
                     {job.scraped_count.toLocaleString('tr-TR')}
                   </td>
-                  <td style={{ padding: '10px 14px', color: COLORS.textMuted, fontSize: FONT_SIZE.xs }}>
+                  <td className="px-3.5 py-2.5 text-textMuted text-xs">
                     {job.source}
                   </td>
-                  <td style={{ padding: '10px 14px', color: COLORS.textMuted, fontSize: FONT_SIZE.xs, whiteSpace: 'nowrap' }}>
+                  <td className="px-3.5 py-2.5 text-textMuted text-xs whitespace-nowrap">
                     {formatDate(job.created_at)}
                   </td>
                 </tr>

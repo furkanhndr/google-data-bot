@@ -7,7 +7,6 @@ import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 
 const CONFIRM_WORD = 'SİL'
 
@@ -34,11 +33,11 @@ export function DangerZone() {
   }
 
   return (
-    <Card style={{ border: `1px solid #FCA5A5` }}>
-      <h2 style={{ margin: '0 0 8px', fontSize: FONT_SIZE.lg, fontWeight: '600', color: COLORS.danger }}>
+    <Card className="border-red-300">
+      <h2 className="mb-2 text-lg font-semibold text-danger">
         Tehlikeli Bölge
       </h2>
-      <p style={{ margin: '0 0 16px', fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>
+      <p className="mb-4 text-sm text-textMuted">
         Hesabınızı silmek tüm işlerinizi, sonuçlarınızı ve dışa aktarmalarınızı kalıcı olarak siler.
         Bu işlem geri alınamaz.
       </p>
@@ -46,14 +45,14 @@ export function DangerZone() {
       {!open ? (
         <Button variant="danger" onClick={() => setOpen(true)}>Hesabı Sil</Button>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '360px' }}>
+        <div className="flex flex-col gap-3 max-w-[360px]">
           <Input
             label={`Onaylamak için "${CONFIRM_WORD}" yazın`}
             value={confirm}
             onChange={e => setConfirm(e.target.value)}
             placeholder={CONFIRM_WORD}
           />
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div className="flex gap-2.5">
             <Button variant="secondary" onClick={() => { setOpen(false); setConfirm('') }}>
               İptal
             </Button>

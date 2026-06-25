@@ -7,7 +7,6 @@ import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 
 interface ProfileSettingsProps {
   userId: string
@@ -72,21 +71,16 @@ export function ProfileSettings({ userId, email, initialName, initialAvatar }: P
   const initial = (name || email || 'U')[0].toUpperCase()
 
   return (
-    <Card style={{ marginBottom: '16px' }}>
-      <h2 style={{ margin: '0 0 20px', fontSize: FONT_SIZE.lg, fontWeight: '600', color: COLORS.text }}>
+    <Card className="mb-4">
+      <h2 className="mb-5 text-lg font-semibold text-text">
         Profil Bilgileri
       </h2>
 
       {/* Avatar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-        <div style={{
-          width: '64px', height: '64px', borderRadius: '50%',
-          backgroundColor: COLORS.primary, color: '#fff',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '24px', fontWeight: '700', overflow: 'hidden', flexShrink: 0,
-        }}>
+      <div className="flex items-center gap-4 mb-5">
+        <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold overflow-hidden flex-shrink-0">
           {avatar
-            ? <img src={avatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ? <img src={avatar} alt="avatar" className="w-full h-full object-cover" />
             : initial}
         </div>
         <div>
@@ -95,18 +89,18 @@ export function ProfileSettings({ userId, email, initialName, initialAvatar }: P
             type="file"
             accept="image/*"
             onChange={handleAvatarChange}
-            style={{ display: 'none' }}
+            className="hidden"
           />
           <Button variant="secondary" size="sm" loading={uploading} onClick={() => fileInput.current?.click()}>
             Fotoğraf Yükle
           </Button>
-          <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted, marginTop: '6px' }}>
+          <div className="text-xs text-textMuted mt-1.5">
             JPG / PNG, en fazla 2 MB
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '360px' }}>
+      <div className="flex flex-col gap-4 max-w-[360px]">
         <Input label="E-posta" value={email} disabled hint="E-posta değiştirmek için destek ile iletişime geçin." />
         <Input label="Ad Soyad" value={name} onChange={e => setName(e.target.value)} required />
         <div>

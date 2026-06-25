@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
-import { COLORS } from '@/lib/constants'
 import { ToastProvider } from '@/components/ui/Toast'
+import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Google Business Data',
@@ -16,14 +16,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="tr">
-      <body style={{
-        margin: 0,
-        padding: 0,
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        backgroundColor: COLORS.bg,
-        color: COLORS.text,
-        lineHeight: '1.5',
-      }}>
+      <body>
         <ToastProvider>
           {children}
         </ToastProvider>

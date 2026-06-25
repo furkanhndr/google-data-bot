@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { useToast } from '@/components/ui/Toast'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 
 const CATEGORY_OPTIONS = [
   '', 'Restoran', 'Kafe', 'Otel', 'Hastane', 'Diş Kliniği',
@@ -58,11 +57,11 @@ export function JobForm() {
   return (
     <form onSubmit={handleSubmit}>
       <Card>
-        <h2 style={{ margin: '0 0 24px', fontSize: FONT_SIZE.lg, fontWeight: '600', color: COLORS.text }}>
+        <h2 className="mb-6 text-lg font-semibold text-text">
           İş Detayları
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
           <Input
             label="Arama Sorgusu"
             placeholder="örn: Diş kliniği, Restoran, Avukat"
@@ -81,25 +80,16 @@ export function JobForm() {
           />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
           {/* Category */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: FONT_SIZE.sm, fontWeight: '500', color: COLORS.text }}>
-              Kategori <span style={{ color: COLORS.textMuted, fontWeight: '400' }}>(opsiyonel)</span>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-text">
+              Kategori <span className="text-textMuted font-normal">(opsiyonel)</span>
             </label>
             <select
               value={category}
               onChange={e => setCategory(e.target.value)}
-              style={{
-                padding: '9px 12px',
-                border: `1px solid ${COLORS.border}`,
-                borderRadius: '8px',
-                fontSize: FONT_SIZE.base,
-                color: COLORS.text,
-                backgroundColor: '#fff',
-                outline: 'none',
-                cursor: 'pointer',
-              }}
+              className="px-3 py-2 border border-border rounded-lg text-base text-text bg-white outline-none cursor-pointer"
             >
               {CATEGORY_OPTIONS.map(opt => (
                 <option key={opt} value={opt}>{opt || 'Tümü'}</option>
@@ -108,8 +98,8 @@ export function JobForm() {
           </div>
 
           {/* Max results */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: FONT_SIZE.sm, fontWeight: '500', color: COLORS.text }}>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-text">
               Maks. Sonuç
             </label>
             <input
@@ -118,36 +108,19 @@ export function JobForm() {
               max={5000}
               value={maxResults}
               onChange={e => setMaxResults(parseInt(e.target.value) || 100)}
-              style={{
-                padding: '9px 12px',
-                border: `1px solid ${COLORS.border}`,
-                borderRadius: '8px',
-                fontSize: FONT_SIZE.base,
-                color: COLORS.text,
-                backgroundColor: '#fff',
-                outline: 'none',
-              }}
+              className="px-3 py-2 border border-border rounded-lg text-base text-text bg-white outline-none"
             />
           </div>
 
           {/* Min rating */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: FONT_SIZE.sm, fontWeight: '500', color: COLORS.text }}>
-              Min. Puan <span style={{ color: COLORS.textMuted, fontWeight: '400' }}>(opsiyonel)</span>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-text">
+              Min. Puan <span className="text-textMuted font-normal">(opsiyonel)</span>
             </label>
             <select
               value={minRating}
               onChange={e => setMinRating(e.target.value)}
-              style={{
-                padding: '9px 12px',
-                border: `1px solid ${COLORS.border}`,
-                borderRadius: '8px',
-                fontSize: FONT_SIZE.base,
-                color: COLORS.text,
-                backgroundColor: '#fff',
-                outline: 'none',
-                cursor: 'pointer',
-              }}
+              className="px-3 py-2 border border-border rounded-lg text-base text-text bg-white outline-none cursor-pointer"
             >
               <option value="">Tümü</option>
               <option value="3">3+ ⭐</option>
@@ -159,14 +132,7 @@ export function JobForm() {
         </div>
 
         {/* Info box */}
-        <div style={{
-          padding: '12px 16px', marginBottom: '24px',
-          backgroundColor: COLORS.primaryLight,
-          border: `1px solid #BFDBFE`,
-          borderRadius: '8px',
-          fontSize: FONT_SIZE.sm, color: COLORS.primary,
-          display: 'flex', alignItems: 'flex-start', gap: '8px',
-        }}>
+        <div className="px-4 py-3 mb-6 bg-primaryLight border border-blue-200 rounded-lg text-sm text-primary flex items-start gap-2">
           <span>ℹ</span>
           <span>
             İş oluşturulduktan sonra veri toplama sunucuda otomatik başlar.
@@ -174,7 +140,7 @@ export function JobForm() {
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+        <div className="flex gap-3 justify-end">
           <Button
             type="button"
             variant="secondary"

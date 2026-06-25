@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 
 export function PasswordSettings() {
   const { toast } = useToast()
@@ -30,11 +29,11 @@ export function PasswordSettings() {
   }
 
   return (
-    <Card style={{ marginBottom: '16px' }}>
-      <h2 style={{ margin: '0 0 20px', fontSize: FONT_SIZE.lg, fontWeight: '600', color: COLORS.text }}>
+    <Card className="mb-4">
+      <h2 className="mb-5 text-lg font-semibold text-text">
         Şifre Değiştir
       </h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '360px' }}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-[360px]">
         <Input
           label="Yeni Şifre" type="password" value={password}
           onChange={e => setPassword(e.target.value)} required

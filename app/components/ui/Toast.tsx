@@ -1,7 +1,6 @@
 'use client'
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
-import { COLORS, FONT_SIZE, RADIUS, SHADOW } from '@/lib/constants'
 
 type ToastType = 'success' | 'error' | 'warning' | 'info'
 
@@ -28,11 +27,11 @@ const icons: Record<ToastType, string> = {
   info:    'ℹ',
 }
 
-const colors: Record<ToastType, { bg: string; color: string; border: string }> = {
-  success: { bg: COLORS.successLight, color: COLORS.success, border: '#86EFAC' },
-  error:   { bg: COLORS.dangerLight,  color: COLORS.danger,  border: '#FCA5A5' },
-  warning: { bg: COLORS.warningLight, color: COLORS.warning, border: '#FCD34D' },
-  info:    { bg: COLORS.primaryLight, color: COLORS.primary, border: '#93C5FD' },
+const toastClasses: Record<ToastType, { bg: string; text: string; border: string }> = {
+  success: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-300' },
+  error:   { bg: 'bg-red-50',   text: 'text-danger',   border: 'border-red-300' },
+  warning: { bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-300' },
+  info:    { bg: 'bg-blue-50',   text: 'text-primary', border: 'border-blue-300' },
 }
 
 let _id = 0
@@ -50,36 +49,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={{ toast }}>
       {children}
       {/* Toast stack */}
-      <div style={{
-        position: 'fixed', bottom: '24px', right: '24px',
-        display: 'flex', flexDirection: 'column', gap: '8px',
-        zIndex: 200,
-        pointerEvents: 'none',
-      }}>
+      <div className="fixed bottom-6 right-6 flex flex-col gap-2 z-50 pointer-events-none">
         {toasts.map(t => {
-          const { bg, color, border } = colors[t.type]
+          const { bg, text, border } = toastClasses[t.type]
           return (
-            <div key={t.id} style={{
-              display: 'flex', alignItems: 'center', gap: '10px',
-              padding: '12px 16px',
-              backgroundColor: bg,
-              border: `1px solid ${border}`,
-              borderRadius: RADIUS.md,
-              boxShadow: SHADOW.md,
-              fontSize: FONT_SIZE.sm,
-              color,
-              minWidth: '260px',
-              maxWidth: '380px',
-              pointerEvents: 'auto',
-              animation: 'slideIn 0.2s ease',
-            }}>
-              <span style={{ fontWeight: '700', flexShrink: 0 }}>{icons[t.type]}</span>
+            <div key={t.id} className={`flex items-center gap-2.5 px-4 py-3 rounded-md shadow-md text-sm min-w-65 max-w-95 pointer-events-auto animate-slideIn ${
+              bg
+            } border ${border} ${text}`}>
+              <span className="font-bold flex-shrink-0">{icons[t.type]}</span>
               <span>{t.message}</span>
             </div>
           )
         })}
       </div>
-      <style>{`@keyframes slideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }`}</style>
     </ToastContext.Provider>
   )
 }

@@ -1,55 +1,19 @@
 import type { ReactNode } from 'react'
-import { COLORS, SHADOW } from '@/lib/constants'
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: COLORS.bg,
-      padding: '24px',
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '420px',
-      }}>
+    <div className="min-h-screen flex items-center justify-center bg-bg p-6">
+      <div className="w-full max-w-[420px]">
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '10px',
-          }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              backgroundColor: COLORS.primary,
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontSize: '18px',
-              fontWeight: '700',
-            }}>G</div>
-            <span style={{
-              fontSize: '20px',
-              fontWeight: '700',
-              color: COLORS.text,
-            }}>BusinessData</span>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center text-white text-lg font-bold">G</div>
+            <span className="text-xl font-bold text-text">BusinessData</span>
           </div>
         </div>
 
         {/* Card */}
-        <div style={{
-          backgroundColor: COLORS.bgCard,
-          borderRadius: '12px',
-          padding: '32px',
-          boxShadow: SHADOW.md,
-          border: `1px solid ${COLORS.border}`,
-        }}>
+        <div className="bg-bgCard rounded-xl p-8 shadow-md border border-border">
           {children}
         </div>
       </div>

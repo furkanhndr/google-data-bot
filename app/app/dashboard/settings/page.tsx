@@ -4,7 +4,16 @@ import { Badge } from '@/components/ui/Badge'
 import { ProfileSettings } from '@/components/settings/ProfileSettings'
 import { PasswordSettings } from '@/components/settings/PasswordSettings'
 import { DangerZone } from '@/components/settings/DangerZone'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
+
+function percentWidthClass(percent: number) {
+  if (percent <= 0) return 'w-0'
+  if (percent >= 100) return 'w-full'
+  const steps = [
+    'w-1/12', 'w-1/6', 'w-1/4', 'w-1/3', 'w-5/12', 'w-1/2',
+    'w-7/12', 'w-2/3', 'w-3/4', 'w-5/6', 'w-11/12',
+  ]
+  return steps[Math.min(steps.length - 1, Math.floor(percent / (100 / steps.length)))]
+}
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -17,12 +26,14 @@ export default async function SettingsPage() {
     .single()
 
   const creditsPercent = profile
-    ? Math.min(100, Math.round((profile.credits_used / profile.credits_total) * 100))
+    ? profile.plan === 'premium'
+      ? 100
+      : Math.min(100, Math.round((profile.credits_used / profile.credits_total) * 100))
     : 0
 
   return (
-    <div style={{ padding: '32px', maxWidth: '640px' }}>
-      <h1 style={{ margin: '0 0 24px', fontSize: FONT_SIZE['2xl'], fontWeight: '700', color: COLORS.text }}>
+    <div className="p-8 max-w-2xl">
+      <h1 className="mb-6 text-2xl font-bold text-text">
         Hesap Ayarları
       </h1>
 
@@ -38,41 +49,35 @@ export default async function SettingsPage() {
       <PasswordSettings />
 
       {/* Plan & credits (read-only) */}
-      <Card style={{ marginBottom: '16px' }}>
-        <h2 style={{ margin: '0 0 20px', fontSize: FONT_SIZE.lg, fontWeight: '600', color: COLORS.text }}>
+      <Card className="mb-4">
+        <h2 className="mb-5 text-lg font-semibold text-text">
           Plan & Krediler
         </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>Mevcut Plan</span>
+        <div className="flex flex-col gap-3.5">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-textMuted">Mevcut Plan</span>
             <Badge variant={profile?.plan === 'premium' ? 'success' : 'default'}>
               {profile?.plan === 'premium' ? '⭐ Premium' : 'Ücretsiz'}
             </Badge>
           </div>
 
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <span style={{ fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>Kredi Kullanımı</span>
-              <span style={{ fontSize: FONT_SIZE.sm, fontWeight: '600', color: COLORS.text }}>
+            <div className="flex justify-between mb-1.5">
+              <span className="text-sm text-textMuted">Kredi Kullanımı</span>
+              <span className="text-sm font-semibold text-text">
                 {profile?.credits_used ?? 0} / {profile?.plan === 'premium' ? '∞' : (profile?.credits_total ?? 100)}
               </span>
             </div>
             {profile?.plan === 'premium' ? (
-              <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted }}>
+              <div className="text-xs text-textMuted">
                 Premium planında kredi limiti yoktur.
               </div>
             ) : (
               <>
-                <div style={{ height: '8px', backgroundColor: COLORS.border, borderRadius: '4px' }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${creditsPercent}%`,
-                    backgroundColor: creditsPercent > 80 ? COLORS.danger : COLORS.primary,
-                    borderRadius: '4px',
-                    transition: 'width 0.3s',
-                  }} />
+                <div className="h-2 bg-border rounded overflow-hidden">
+                  <div className={`h-full rounded transition-all ${creditsPercent > 80 ? 'bg-red-600' : 'bg-blue-500'} ${percentWidthClass(creditsPercent)}`} />
                 </div>
-                <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted, marginTop: '6px' }}>
+                <div className="text-xs text-textMuted mt-1.5">
                   {Math.max(0, (profile?.credits_total ?? 100) - (profile?.credits_used ?? 0))} kredi kaldı
                 </div>
               </>

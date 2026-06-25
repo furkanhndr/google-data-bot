@@ -1,14 +1,13 @@
 import { JobForm } from '@/components/dashboard/JobForm'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 
 export default function NewJobPage() {
   return (
-    <div style={{ padding: '32px', maxWidth: '800px' }}>
-      <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ margin: 0, fontSize: FONT_SIZE['2xl'], fontWeight: '700', color: COLORS.text }}>
+    <div className="p-8 max-w-[800px]">
+      <div className="mb-7">
+        <h1 className="m-0 text-2xl font-bold text-text">
           Yeni İş
         </h1>
-        <p style={{ margin: '4px 0 0', fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>
+        <p className="mt-1 text-sm text-textMuted">
           Google Maps'ten çekilecek veri için parametreleri belirleyin.
         </p>
       </div>

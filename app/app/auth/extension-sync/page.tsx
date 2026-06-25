@@ -28,7 +28,7 @@ export default function ExtensionSyncPage() {
   }, [redirectTo, router])
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+    <div className="flex items-center justify-center h-screen">
       <PageSpinner />
     </div>
   )

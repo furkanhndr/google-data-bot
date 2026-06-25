@@ -80,24 +80,27 @@ const COLUMN_HEADERS: Record<string, string> = {
   scraped_at:             'Çekilme Tarihi',
 }
 
-export function generateCSV(results: BusinessResult[]): Buffer {
-  const header = EXPORT_COLUMNS.map(k => COLUMN_HEADERS[k] ?? k).join(',')
-  const rows = results.map(r => {
-    const flat = flattenRow(r)
-    return EXPORT_COLUMNS.map(k => {
-      const val = flat[k]
-      if (val == null) return ''
-      const str = String(val)
-      // Escape quotes and wrap in quotes if contains comma/quote/newline
-      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-        return `"${str.replace(/"/g, '""')}"`
-      }
-      return str
-    }).join(',')
-  })
+export function getCsvHeader(): string {
+  return EXPORT_COLUMNS.map(k => COLUMN_HEADERS[k] ?? k).join(',')
+}
 
+export function serializeCsvRow(result: BusinessResult): string {
+  const flat = flattenRow(result)
+  return EXPORT_COLUMNS.map(k => {
+    const val = flat[k]
+    if (val == null) return ''
+    const str = String(val)
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`
+    }
+    return str
+  }).join(',')
+}
+
+export function generateCSV(results: BusinessResult[]): Buffer {
+  const header = getCsvHeader()
+  const rows = results.map(result => serializeCsvRow(result))
   const csv = [header, ...rows].join('\n')
-  // UTF-8 BOM for Excel compatibility
   return Buffer.concat([Buffer.from('﻿', 'utf8'), Buffer.from(csv, 'utf8')])
 }
 

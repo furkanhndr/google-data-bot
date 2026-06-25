@@ -1,19 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { COLORS, FONT_SIZE, RADIUS } from '@/lib/constants'
 import type { BusinessResult } from '@googlebusinessdata/shared-types'
 
 const COLUMNS = [
-  { key: 'name',         label: 'İşletme Adı',  width: '200px' },
-  { key: 'category',     label: 'Kategori',      width: '130px' },
-  { key: 'phone',        label: 'Telefon',       width: '130px' },
-  { key: 'email',        label: 'E-posta',       width: '180px' },
-  { key: 'website',      label: 'Web Site',      width: '160px' },
-  { key: 'address_full', label: 'Adres',         width: '200px' },
-  { key: 'city',         label: 'Şehir',         width: '100px' },
-  { key: 'rating',       label: 'Puan',          width: '70px' },
-  { key: 'review_count', label: 'Yorum',         width: '70px' },
+  { key: 'name',         label: 'İşletme Adı',  widthClass: 'w-[200px]', maxWidthClass: 'max-w-[200px]' },
+  { key: 'category',     label: 'Kategori',      widthClass: 'w-[130px]', maxWidthClass: 'max-w-[130px]' },
+  { key: 'phone',        label: 'Telefon',       widthClass: 'w-[130px]', maxWidthClass: 'max-w-[130px]' },
+  { key: 'email',        label: 'E-posta',       widthClass: 'w-[180px]', maxWidthClass: 'max-w-[180px]' },
+  { key: 'website',      label: 'Web Site',      widthClass: 'w-[160px]', maxWidthClass: 'max-w-[160px]' },
+  { key: 'address_full', label: 'Adres',         widthClass: 'w-[200px]', maxWidthClass: 'max-w-[200px]' },
+  { key: 'city',         label: 'Şehir',         widthClass: 'w-[100px]', maxWidthClass: 'max-w-[100px]' },
+  { key: 'rating',       label: 'Puan',          widthClass: 'w-[70px]',  maxWidthClass: 'max-w-[70px]' },
+  { key: 'review_count', label: 'Yorum',         widthClass: 'w-[70px]',  maxWidthClass: 'max-w-[70px]' },
 ]
 
 // Hint shown in the email column when no email was found, reflecting why.
@@ -38,12 +37,9 @@ function CopyButton({ value }: { value: string }) {
           setTimeout(() => setCopied(false), 1200)
         }).catch(() => {})
       }}
-      style={{
-        background: 'none', border: 'none', cursor: 'pointer',
-        padding: '2px', marginLeft: '4px', flexShrink: 0, lineHeight: 1,
-        fontSize: FONT_SIZE.xs,
-        color: copied ? COLORS.success : COLORS.textLight,
-      }}
+      className={`bg-none border-none cursor-pointer p-0.5 ml-1 flex-shrink-0 leading-none text-xs transition-colors ${
+        copied ? 'text-green-600' : 'text-gray-400'
+      }`}
     >
       {copied ? '✓' : '📋'}
     </button>
@@ -56,19 +52,19 @@ function CellValue({ col, row }: { col: string; row: BusinessResult }) {
   if (col === 'email' && (val == null || val === '')) {
     const hint = row.email_status ? EMAIL_STATUS_HINT[row.email_status] : undefined
     return (
-      <span style={{ color: COLORS.textLight, fontSize: FONT_SIZE.xs, fontStyle: 'italic' }}>
+      <span className="text-textLight text-xs italic">
         {hint ?? '—'}
       </span>
     )
   }
 
-  if (val == null || val === '') return <span style={{ color: COLORS.textLight }}>—</span>
+  if (val == null || val === '') return <span className="text-textLight">—</span>
 
   if (col === 'email') {
     return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', maxWidth: '100%' }}>
+      <span className="inline-flex items-center max-w-full">
         <a href={`mailto:${String(val)}`}
-          style={{ color: COLORS.primary, fontSize: FONT_SIZE.xs, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          className="text-primary text-xs overflow-hidden overflow-ellipsis whitespace-nowrap"
           onClick={e => e.stopPropagation()}
         >
           {String(val)}
@@ -80,8 +76,8 @@ function CellValue({ col, row }: { col: string; row: BusinessResult }) {
 
   if (col === 'phone') {
     return (
-      <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-        <span style={{ whiteSpace: 'nowrap' }}>{String(val)}</span>
+      <span className="inline-flex items-center">
+        <span className="whitespace-nowrap">{String(val)}</span>
         <CopyButton value={String(val)} />
       </span>
     )
@@ -90,7 +86,7 @@ function CellValue({ col, row }: { col: string; row: BusinessResult }) {
   if (col === 'website' || col === 'maps_url') {
     return (
       <a href={String(val)} target="_blank" rel="noopener noreferrer"
-        style={{ color: COLORS.primary, fontSize: FONT_SIZE.xs, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block', maxWidth: '150px' }}
+        className="text-primary text-xs overflow-hidden overflow-ellipsis whitespace-nowrap block max-w-xs"
         onClick={e => e.stopPropagation()}
       >
         {String(val).replace(/^https?:\/\//, '')}
@@ -98,10 +94,10 @@ function CellValue({ col, row }: { col: string; row: BusinessResult }) {
     )
   }
   if (col === 'rating') {
-    return <span style={{ fontWeight: '600', color: '#D97706' }}>⭐ {String(val)}</span>
+    return <span className="font-semibold text-amber-600">⭐ {String(val)}</span>
   }
   return (
-    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block', maxWidth: '200px' }}>
+    <span className="block overflow-hidden overflow-ellipsis whitespace-nowrap max-w-xs">
       {String(val)}
     </span>
   )
@@ -138,11 +134,8 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
   return (
     <div>
       {/* Toolbar */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: '12px', gap: '12px',
-      }}>
-        <span style={{ fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>
+      <div className="flex items-center justify-between mb-3 gap-3">
+        <span className="text-sm text-textMuted">
           {total.toLocaleString('tr-TR')} sonuç
           {search && ` · ${filtered.length} eşleşme`}
         </span>
@@ -150,32 +143,18 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
           placeholder="İsim, şehir veya kategori ara..."
           value={search}
           onChange={e => handleSearch(e.target.value)}
-          style={{
-            padding: '7px 12px',
-            border: `1px solid ${COLORS.border}`,
-            borderRadius: RADIUS.md,
-            fontSize: FONT_SIZE.sm,
-            outline: 'none',
-            width: '260px',
-          }}
+          className="px-3 py-1.75 border border-border rounded-md text-sm outline-none w-64"
         />
       </div>
 
       {/* Table */}
-      <div style={{ overflowX: 'auto', border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.md }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: FONT_SIZE.sm }}>
+      <div className="overflow-x-auto border border-border rounded-md">
+        <table className="w-full border-collapse text-sm">
           <thead>
-            <tr style={{ backgroundColor: COLORS.bg }}>
+            <tr className="bg-bg">
               {COLUMNS.map(col => (
-                <th key={col.key} style={{
-                  padding: '10px 12px',
-                  textAlign: 'left',
-                  fontWeight: '600',
-                  color: COLORS.textMuted,
-                  borderBottom: `2px solid ${COLORS.border}`,
-                  whiteSpace: 'nowrap',
-                  width: col.width,
-                }}>
+                <th key={col.key}
+                  className={`px-3 py-2.5 text-left font-semibold text-textMuted border-b-2 border-border whitespace-nowrap ${col.widthClass}`}>
                   {col.label}
                 </th>
               ))}
@@ -184,14 +163,14 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
           <tbody>
             {paged.length === 0 ? (
               <tr>
-                <td colSpan={COLUMNS.length} style={{ padding: '40px', textAlign: 'center', color: COLORS.textMuted }}>
+                <td colSpan={COLUMNS.length} className="p-10 text-center text-textMuted">
                   {search ? 'Arama sonucu bulunamadı.' : 'Henüz sonuç yok — scraping başlatıldığında burada görünecek.'}
                 </td>
               </tr>
             ) : paged.map(row => (
-              <tr key={row.id} style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+              <tr key={row.id} className="border-b border-border">
                 {COLUMNS.map(col => (
-                  <td key={col.key} style={{ padding: '10px 12px', verticalAlign: 'middle', maxWidth: col.width }}>
+                  <td key={col.key} className={`px-3 py-2.5 align-middle ${col.maxWidthClass}`}>
                     <CellValue col={col.key} row={row} />
                   </td>
                 ))}
@@ -203,33 +182,21 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
+        <div className="flex items-center justify-center gap-2 mt-4">
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={safePage === 1}
-            style={{
-              padding: '6px 12px', borderRadius: RADIUS.md, border: `1px solid ${COLORS.border}`,
-              cursor: safePage === 1 ? 'default' : 'pointer',
-              backgroundColor: safePage === 1 ? COLORS.bg : '#fff',
-              color: safePage === 1 ? COLORS.textMuted : COLORS.text,
-              fontSize: FONT_SIZE.sm,
-            }}
+            className="px-3 py-1.5 rounded-md border border-border text-sm disabled:bg-bg disabled:text-textMuted disabled:cursor-default hover:enabled:bg-white transition-colors"
           >
             ← Önceki
           </button>
-          <span style={{ fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>
+          <span className="text-sm text-textMuted">
             {safePage} / {totalPages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={safePage === totalPages}
-            style={{
-              padding: '6px 12px', borderRadius: RADIUS.md, border: `1px solid ${COLORS.border}`,
-              cursor: safePage === totalPages ? 'default' : 'pointer',
-              backgroundColor: safePage === totalPages ? COLORS.bg : '#fff',
-              color: safePage === totalPages ? COLORS.textMuted : COLORS.text,
-              fontSize: FONT_SIZE.sm,
-            }}
+            className="px-3 py-1.5 rounded-md border border-border text-sm disabled:bg-bg disabled:text-textMuted disabled:cursor-default hover:enabled:bg-white transition-colors"
           >
             Sonraki →
           </button>

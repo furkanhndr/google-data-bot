@@ -42,6 +42,23 @@
 
     /* Auth */
     .auth-row { display: flex; align-items: center; justify-content: space-between; }
+    .job-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .truncate-job { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+    .job-location { font-size: 11px; color: #64748B; }
+    .progress-text { font-size: 10px; color: #94A3B8; margin-top: 4px; }
+    .empty-text { font-size: 12px; color: #64748B; }
+    .hidden { display: none; }
+    .w-0 { width: 0%; }
+    .w-10 { width: 10%; }
+    .w-20 { width: 20%; }
+    .w-30 { width: 30%; }
+    .w-40 { width: 40%; }
+    .w-50 { width: 50%; }
+    .w-60 { width: 60%; }
+    .w-70 { width: 70%; }
+    .w-80 { width: 80%; }
+    .w-90 { width: 90%; }
+    .w-100 { width: 100%; }
     .badge {
       display: inline-flex; align-items: center;
       padding: 2px 8px; border-radius: 999px;
@@ -117,13 +134,13 @@
   </div>
 
   <!-- Job status section -->
-  <div class="section" id="section-job" style="display:none">
+  <div class="section hidden" id="section-job">
     <div class="label">Aktif İş</div>
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
-      <div class="value" id="job-query" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;">—</div>
+    <div class="job-title-row">
+      <div class="value truncate-job" id="job-query">—</div>
       <span class="badge" id="job-status-badge">—</span>
     </div>
-    <div style="font-size:11px; color:#64748B;" id="job-location">—</div>
+    <div class="job-location" id="job-location">—</div>
 
     <div class="stats-row">
       <div class="stat">
@@ -141,16 +158,16 @@
     </div>
 
     <div class="progress-bar-bg">
-      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      <div class="progress-bar-fill w-0" id="progress-fill"></div>
     </div>
-    <div style="font-size:10px; color:#94A3B8; margin-top:4px;" id="progress-text">0% tamamlandı</div>
+    <div class="progress-text" id="progress-text">0% tamamlandı</div>
   </div>
 
   <!-- No active job -->
   <div class="section" id="section-no-job">
     <div class="empty">
       <div class="empty-icon">⚡</div>
-      <div style="font-size:12px; color:#64748B;">Aktif iş yok</div>
+      <div class="empty-text">Aktif iş yok</div>
     </div>
   </div>
 
@@ -158,14 +175,14 @@
   <div class="section" id="section-actions">
     <div class="btn-row">
       <button class="btn btn-primary" id="btn-new-job">+ Yeni İş</button>
-      <button class="btn btn-danger"  id="btn-cancel" style="display:none">İptal</button>
+      <button class="btn btn-danger hidden"  id="btn-cancel">İptal</button>
     </div>
   </div>
 
   <!-- Footer -->
   <div class="footer">
     <span class="credits" id="footer-credits">— kredi</span>
-    <a class="footer-link" id="btn-login" style="display:none">Giriş Yap</a>
+    <a class="footer-link hidden" id="btn-login">Giriş Yap</a>
     <a class="footer-link" id="btn-dashboard">Dashboard →</a>
   </div>
 

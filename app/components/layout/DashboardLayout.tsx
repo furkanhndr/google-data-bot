@@ -6,7 +6,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { JobNotifier } from '@/components/layout/JobNotifier'
 import { useMediaQuery } from '@/lib/hooks/useMediaQuery'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 import type { ReactNode } from 'react'
 import type { UserProfile } from '@googlebusinessdata/shared-types'
 
@@ -22,6 +21,16 @@ interface DashboardLayoutProps {
   profile: UserProfile & { email?: string }
 }
 
+function percentWidthClass(percent: number) {
+  if (percent <= 0) return 'w-0'
+  if (percent >= 100) return 'w-full'
+  const steps = [
+    'w-1/12', 'w-1/6', 'w-1/4', 'w-1/3', 'w-5/12', 'w-1/2',
+    'w-7/12', 'w-2/3', 'w-3/4', 'w-5/6', 'w-11/12',
+  ]
+  return steps[Math.min(steps.length - 1, Math.floor(percent / (100 / steps.length)))]
+}
+
 export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
   const pathname = usePathname()
   const router   = useRouter()
@@ -35,46 +44,36 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
     router.refresh()
   }
 
-  const creditsPercent = Math.min(100, Math.round((profile.credits_used / profile.credits_total) * 100))
+  const creditsPercent = profile.plan === 'premium'
+    ? 100
+    : Math.min(100, Math.round((profile.credits_used / profile.credits_total) * 100))
 
   const sidebar = (
-    <aside style={{
-      width: '240px',
-      minWidth: '240px',
-      backgroundColor: COLORS.sidebar,
-      display: 'flex',
-      flexDirection: 'column',
-    }}>
+    <aside className="w-60 flex-shrink-0 bg-gray-800 flex flex-col">
       {/* Logo */}
-      <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid rgba(255,255,255,0.08)` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '32px', height: '32px', backgroundColor: COLORS.primary, borderRadius: '8px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontSize: '16px', fontWeight: '700',
-          }}>G</div>
-          <span style={{ color: '#fff', fontWeight: '700', fontSize: FONT_SIZE.base }}>BusinessData</span>
+      <div className="px-5 py-4 border-b border-white border-opacity-10">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white text-base font-bold">
+            G
+          </div>
+          <span className="text-white font-bold text-base">BusinessData</span>
         </div>
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '12px 0' }}>
+      <nav className="flex-1 py-3">
         {NAV_ITEMS.map(item => {
           const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
           return (
-            <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }} onClick={() => setDrawerOpen(false)}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                padding: '10px 20px',
-                backgroundColor: active ? 'rgba(37,99,235,0.25)' : 'transparent',
-                borderLeft: `3px solid ${active ? COLORS.primary : 'transparent'}`,
-                color: active ? '#fff' : COLORS.sidebarText,
-                fontSize: FONT_SIZE.sm,
-                fontWeight: active ? '600' : '400',
-                transition: 'background-color 0.15s',
-                cursor: 'pointer',
-              }}>
-                <span style={{ fontSize: '15px' }}>{item.icon}</span>
+            <Link key={item.href} href={item.href} className="no-underline" onClick={() => setDrawerOpen(false)}>
+              <div className={`
+                flex items-center gap-2.5 px-5 py-2.5 border-l-[3px] transition-colors
+                ${active 
+                  ? 'bg-blue-600 bg-opacity-25 border-blue-500 text-white font-semibold' 
+                  : 'border-transparent text-gray-300 font-normal hover:bg-gray-700'
+                }
+              `}>
+                <span className="text-[15px]">{item.icon}</span>
                 {item.label}
               </div>
             </Link>
@@ -83,52 +82,44 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
       </nav>
 
       {/* Credits widget */}
-      <div style={{ margin: '0 12px 12px', padding: '12px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '8px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-          <span style={{ fontSize: FONT_SIZE.xs, color: COLORS.sidebarText }}>Krediler</span>
-          <span style={{ fontSize: FONT_SIZE.xs, color: '#fff', fontWeight: '600' }}>
+      <div className="mx-3 mb-3 p-3 bg-white bg-opacity-6 rounded-lg">
+        <div className="flex justify-between mb-1.5">
+          <span className="text-xs text-gray-300">Krediler</span>
+          <span className="text-xs text-white font-semibold">
             {profile.credits_used} / {profile.plan === 'premium' ? '∞' : profile.credits_total}
           </span>
         </div>
         {profile.plan === 'free' && (
-          <div style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: '2px' }}>
-            <div style={{
-              height: '100%', width: `${creditsPercent}%`,
-              backgroundColor: creditsPercent > 80 ? COLORS.danger : COLORS.primary,
-              borderRadius: '2px', transition: 'width 0.3s',
-            }} />
+          <div className="h-1 bg-white bg-opacity-15 rounded-sm overflow-hidden">
+            <div className={`
+              h-full transition-all rounded-sm
+              ${creditsPercent > 80 ? 'bg-red-500' : 'bg-blue-500'}
+              ${percentWidthClass(creditsPercent)}
+            `} />
           </div>
         )}
-        <div style={{ marginTop: '6px', fontSize: FONT_SIZE.xs, color: COLORS.sidebarText }}>
-          Plan: <span style={{ color: profile.plan === 'premium' ? '#FBBF24' : '#94A3B8', fontWeight: '600' }}>
+        <div className="mt-1.5 text-xs text-gray-300">
+          Plan: <span className={`font-semibold ${profile.plan === 'premium' ? 'text-amber-400' : 'text-gray-400'}`}>
             {profile.plan === 'premium' ? 'Premium' : 'Ücretsiz'}
           </span>
         </div>
       </div>
 
       {/* User + logout */}
-      <div style={{
-        padding: '12px 16px', borderTop: `1px solid rgba(255,255,255,0.08)`,
-        display: 'flex', alignItems: 'center', gap: '10px',
-      }}>
-        <div style={{
-          width: '30px', height: '30px', borderRadius: '50%', backgroundColor: COLORS.primary,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff', fontSize: '13px', fontWeight: '700', flexShrink: 0, overflow: 'hidden',
-        }}>
+      <div className="px-4 py-3 border-t border-white border-opacity-10 flex items-center gap-2.5">
+        <div className="w-7.5 h-7.5 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
           {profile.avatar_url
-            ? <img src={profile.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
             : (profile.display_name ?? profile.email ?? 'U')[0].toUpperCase()}
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '12px', fontWeight: '500', color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div className="flex-1 min-w-0">
+          <div className="text-xs font-medium text-white truncate">
             {profile.display_name ?? profile.email ?? 'Kullanıcı'}
           </div>
         </div>
-        <button onClick={handleLogout} title="Çıkış yap" style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          color: COLORS.sidebarText, fontSize: '16px', padding: '2px', flexShrink: 0,
-        }}>↩</button>
+        <button onClick={handleLogout} title="Çıkış yap" className="
+          bg-none border-none cursor-pointer text-gray-300 text-base p-0.5 flex-shrink-0 hover:text-white
+        ">↩</button>
       </div>
     </aside>
   )
@@ -136,39 +127,37 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
   // ── Mobile: top bar + slide-in drawer ──────────────────────────────────────
   if (isMobile) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: COLORS.bg }}>
+      <div className="min-h-screen bg-gray-50">
         <JobNotifier userId={profile.id} />
 
         {/* Top bar */}
-        <header style={{
-          position: 'fixed', top: 0, left: 0, right: 0, height: '56px', zIndex: 50,
-          backgroundColor: COLORS.sidebar, display: 'flex', alignItems: 'center', gap: '12px', padding: '0 16px',
-        }}>
-          <button onClick={() => setDrawerOpen(true)} aria-label="Menüyü aç" style={{
-            background: 'none', border: 'none', color: '#fff', fontSize: '22px', cursor: 'pointer', padding: '4px', lineHeight: 1,
-          }}>☰</button>
-          <span style={{ color: '#fff', fontWeight: '700', fontSize: FONT_SIZE.base }}>BusinessData</span>
+        <header className="
+          fixed top-0 left-0 right-0 h-14 z-50 bg-gray-800 flex items-center gap-3 px-4
+        ">
+          <button onClick={() => setDrawerOpen(true)} aria-label="Menüyü aç" className="
+            bg-none border-none text-white text-2xl cursor-pointer p-1 leading-none
+          ">☰</button>
+          <span className="text-white font-bold text-base">BusinessData</span>
         </header>
 
         {/* Overlay */}
         {drawerOpen && (
-          <div onClick={() => setDrawerOpen(false)} style={{
-            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 60,
-          }} />
+          <div onClick={() => setDrawerOpen(false)} className="
+            fixed inset-0 bg-black bg-opacity-50 z-60
+          " />
         )}
 
         {/* Drawer */}
-        <div style={{
-          position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 70, display: 'flex',
-          transform: drawerOpen ? 'translateX(0)' : 'translateX(-100%)',
-          transition: 'transform 0.2s ease',
-          boxShadow: drawerOpen ? '2px 0 16px rgba(0,0,0,0.3)' : 'none',
-        }}>
+        <div className={`
+          fixed top-0 bottom-0 left-0 z-70 flex
+          transition-transform duration-200 ease-out
+          ${drawerOpen ? 'translate-x-0 shadow-lg' : '-translate-x-full'}
+        `}>
           {sidebar}
         </div>
 
         {/* Content */}
-        <main style={{ paddingTop: '56px', minHeight: '100vh' }}>
+        <main className="pt-14 min-h-screen">
           {children}
         </main>
       </div>
@@ -177,10 +166,10 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
 
   // ── Desktop: fixed sidebar + content ────────────────────────────────────────
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: COLORS.bg }}>
+    <div className="flex min-h-screen bg-gray-50">
       <JobNotifier userId={profile.id} />
       {sidebar}
-      <main style={{ flex: 1, minWidth: 0, overflow: 'auto' }}>{children}</main>
+      <main className="flex-1 min-w-0 overflow-auto">{children}</main>
     </div>
   )
 }

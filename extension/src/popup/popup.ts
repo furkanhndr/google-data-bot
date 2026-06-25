@@ -7,8 +7,8 @@ const APP_URL = process.env.APP_URL ?? 'http://localhost:3000'
 function el<T extends HTMLElement = HTMLElement>(id: string) {
   return document.getElementById(id) as T
 }
-function show(id: string) { const e = el(id); if (e) e.style.display = '' }
-function hide(id: string) { const e = el(id); if (e) e.style.display = 'none' }
+function show(id: string) { const e = el(id); if (e) e.classList.remove('hidden') }
+function hide(id: string) { const e = el(id); if (e) e.classList.add('hidden') }
 function text(id: string, val: string) { const e = el(id); if (e) e.textContent = val }
 function html(id: string, val: string) { const e = el(id); if (e) e.innerHTML = val }
 
@@ -18,6 +18,11 @@ const STATUS_BADGES: Record<string, { cls: string; label: string }> = {
   completed: { cls: 'badge-green',  label: 'Tamamlandı' },
   failed:    { cls: 'badge-red',    label: 'Hata' },
   cancelled: { cls: 'badge-gray',   label: 'İptal' },
+}
+
+function percentClass(percent: number) {
+  const rounded = Math.max(0, Math.min(100, Math.round(percent / 10) * 10))
+  return `w-${rounded}`
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -70,7 +75,9 @@ async function render() {
       ? Math.round((jobStatus.scrapedCount / jobStatus.totalFound) * 100)
       : 0
     const fill = el('progress-fill')
-    if (fill) fill.style.width = `${pct}%`
+    if (fill) {
+      fill.className = `progress-bar-fill ${percentClass(pct)}`
+    }
     text('progress-text', `${pct}% tamamlandı`)
 
     el('btn-cancel').onclick = async () => {

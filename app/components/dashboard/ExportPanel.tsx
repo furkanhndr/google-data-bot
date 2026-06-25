@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
-import { COLORS, FONT_SIZE, RADIUS } from '@/lib/constants'
 
 interface ExportPanelProps {
   jobId: string
@@ -42,49 +41,26 @@ export function ExportPanel({ jobId, resultCount }: ExportPanelProps) {
   }
 
   return (
-    <div style={{
-      backgroundColor: COLORS.successLight,
-      border: `1px solid #86EFAC`,
-      borderRadius: RADIUS.lg,
-      padding: '16px 20px',
-      marginBottom: '24px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: '16px',
-      flexWrap: 'wrap',
-    }}>
+    <div className="bg-successLight border border-green-300 rounded-lg px-5 py-4 mb-6 flex items-center justify-between gap-4 flex-wrap">
       <div>
-        <div style={{ fontWeight: '600', color: COLORS.success, fontSize: FONT_SIZE.sm }}>
+        <div className="font-semibold text-success text-sm">
           ✓ İş tamamlandı — {resultCount.toLocaleString('tr-TR')} sonuç hazır
         </div>
-        <div style={{ fontSize: FONT_SIZE.xs, color: '#166534', marginTop: '2px' }}>
+        <div className="text-xs text-green-800 mt-0.5">
           Tüm verileri dışa aktarmak için format seçin.
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div className="flex items-center gap-2.5">
         {/* Format toggle */}
-        <div style={{
-          display: 'flex',
-          border: `1px solid #86EFAC`,
-          borderRadius: RADIUS.md,
-          overflow: 'hidden',
-        }}>
+        <div className="flex border border-green-300 rounded-md overflow-hidden">
           {(['csv', 'xlsx'] as const).map(f => (
             <button
               key={f}
               onClick={() => setFormat(f)}
-              style={{
-                padding: '6px 14px',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: FONT_SIZE.sm,
-                fontWeight: '500',
-                backgroundColor: format === f ? COLORS.success : 'transparent',
-                color: format === f ? '#fff' : COLORS.success,
-                transition: 'background-color 0.15s',
-              }}
+              className={`px-3.5 py-1.5 border-none cursor-pointer text-sm font-medium transition-colors ${
+                format === f ? 'bg-success text-white' : 'bg-transparent text-success'
+              }`}
             >
               {f.toUpperCase()}
             </button>
@@ -95,7 +71,7 @@ export function ExportPanel({ jobId, resultCount }: ExportPanelProps) {
           size="sm"
           loading={loading}
           onClick={handleExport}
-          style={{ backgroundColor: COLORS.success }}
+          className="bg-success"
         >
           ↓ İndir
         </Button>

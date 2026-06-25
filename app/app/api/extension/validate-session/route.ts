@@ -3,8 +3,17 @@ import { createClient } from '@/lib/supabase/server'
 
 // GET /api/extension/validate-session
 // Called by the Chrome extension on startup to verify the token.
-export async function GET(_req: NextRequest) {
+export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get('authorization') ?? ''
   const supabase = await createClient()
+
+  if (authHeader.startsWith('Bearer ')) {
+    const token = authHeader.slice(7).trim()
+    if (token) {
+      await supabase.auth.setSession({ access_token: token, refresh_token: '' })
+    }
+  }
+
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) return NextResponse.json({ valid: false }, { status: 401 })
@@ -26,6 +35,6 @@ export async function GET(_req: NextRequest) {
     role:         profile.role,
     plan:         profile.plan,
     creditsUsed:  profile.credits_used,
-    creditsTotal: profile.credits_total,
+    creditsTotal: profile.plan === 'premium' ? Infinity : profile.credits_total,
   })
 }

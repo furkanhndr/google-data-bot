@@ -1,4 +1,5 @@
 import type { BusinessResult } from './business'
+import type { UserPlan } from './user'
 
 export type ExtensionMessage =
   | { type: 'JOB_STARTED'; jobId: string }
@@ -23,6 +24,7 @@ export interface ExtensionAuthStatus {
   userId: string | null
   email: string | null
   role: string | null
+  plan: UserPlan | null
   creditsTotal: number
   creditsUsed: number
 }

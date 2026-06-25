@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useMediaQuery } from '@/lib/hooks/useMediaQuery'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 import type { ReactNode } from 'react'
 
 const ADMIN_NAV = [
@@ -29,43 +28,30 @@ export function AdminLayout({ children, email }: { children: ReactNode; email: s
   }
 
   const sidebar = (
-    <aside style={{
-      width: '240px', minWidth: '240px',
-      backgroundColor: COLORS.adminSidebar,
-      display: 'flex', flexDirection: 'column',
-    }}>
+    <aside className="w-60 flex-shrink-0 bg-gray-800 flex flex-col">
       {/* Logo */}
-      <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid rgba(255,255,255,0.08)` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '32px', height: '32px', backgroundColor: '#7C3AED', borderRadius: '8px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontSize: '14px', fontWeight: '700',
-          }}>A</div>
+      <div className="px-5 py-4 border-b border-white border-opacity-5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-purple-600 rounded flex items-center justify-center text-white text-sm font-bold">A</div>
           <div>
-            <div style={{ color: '#fff', fontWeight: '700', fontSize: FONT_SIZE.sm }}>Admin Panel</div>
-            <div style={{ color: '#64748B', fontSize: '11px' }}>BusinessData</div>
+            <div className="text-white font-bold text-sm">Admin Panel</div>
+            <div className="text-slate-500 text-xs">BusinessData</div>
           </div>
         </div>
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '12px 0' }}>
+      <nav className="flex-1 py-3">
         {ADMIN_NAV.map(item => {
           const active = pathname.startsWith(item.href) && item.href !== '/dashboard'
           return (
-            <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }} onClick={() => setDrawerOpen(false)}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                padding: '10px 20px',
-                backgroundColor: active ? 'rgba(124,58,237,0.25)' : 'transparent',
-                borderLeft: `3px solid ${active ? '#7C3AED' : 'transparent'}`,
-                color: active ? '#fff' : COLORS.sidebarText,
-                fontSize: FONT_SIZE.sm,
-                fontWeight: active ? '600' : '400',
-                cursor: 'pointer',
-              }}>
-                <span style={{ fontSize: '15px' }}>{item.icon}</span>
+            <Link key={item.href} href={item.href} className="no-underline block" onClick={() => setDrawerOpen(false)}>
+              <div className={`flex items-center gap-2.5 px-5 py-2.5 transition-colors ${
+                active
+                  ? 'bg-purple-600 bg-opacity-25 border-l-3 border-purple-600 text-white font-semibold'
+                  : 'border-l-3 border-transparent text-slate-300 font-normal hover:bg-gray-700'
+              }`}>
+                <span className="text-base">{item.icon}</span>
                 {item.label}
               </div>
             </Link>
@@ -74,24 +60,14 @@ export function AdminLayout({ children, email }: { children: ReactNode; email: s
       </nav>
 
       {/* User + logout */}
-      <div style={{
-        padding: '12px 16px', borderTop: `1px solid rgba(255,255,255,0.08)`,
-        display: 'flex', alignItems: 'center', gap: '10px',
-      }}>
-        <div style={{
-          width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#7C3AED',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff', fontSize: '13px', fontWeight: '700', flexShrink: 0,
-        }}>
+      <div className="px-4 py-3 border-t border-white border-opacity-5 flex items-center gap-2.5">
+        <div className="w-7.5 h-7.5 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
           {email[0].toUpperCase()}
         </div>
-        <div style={{ flex: 1, minWidth: 0, fontSize: '12px', color: '#94A3B8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div className="flex-1 min-w-0 text-xs text-slate-400 overflow-hidden overflow-ellipsis whitespace-nowrap">
           {email}
         </div>
-        <button onClick={handleLogout} title="Çıkış yap" style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          color: COLORS.sidebarText, fontSize: '16px', flexShrink: 0,
-        }}>↩</button>
+        <button onClick={handleLogout} title="Çıkış yap" className="bg-none border-none cursor-pointer text-slate-300 text-base flex-shrink-0 hover:text-white transition-colors">↩</button>
       </div>
     </aside>
   )
@@ -99,42 +75,32 @@ export function AdminLayout({ children, email }: { children: ReactNode; email: s
   // ── Mobile: top bar + slide-in drawer ──────────────────────────────────────
   if (isMobile) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: COLORS.bg }}>
-        <header style={{
-          position: 'fixed', top: 0, left: 0, right: 0, height: '56px', zIndex: 50,
-          backgroundColor: COLORS.adminSidebar, display: 'flex', alignItems: 'center', gap: '12px', padding: '0 16px',
-        }}>
-          <button onClick={() => setDrawerOpen(true)} aria-label="Menüyü aç" style={{
-            background: 'none', border: 'none', color: '#fff', fontSize: '22px', cursor: 'pointer', padding: '4px', lineHeight: 1,
-          }}>☰</button>
-          <span style={{ color: '#fff', fontWeight: '700', fontSize: FONT_SIZE.sm }}>Admin Panel</span>
+      <div className="min-h-screen bg-gray-50">
+        <header className="fixed top-0 left-0 right-0 h-14 z-50 bg-gray-800 flex items-center gap-3 px-4">
+          <button onClick={() => setDrawerOpen(true)} aria-label="Menüyü aç" className="bg-none border-none text-white text-2xl cursor-pointer p-1 leading-none hover:text-gray-300 transition-colors">☰</button>
+          <span className="text-white font-bold text-sm">Admin Panel</span>
         </header>
 
         {drawerOpen && (
-          <div onClick={() => setDrawerOpen(false)} style={{
-            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 60,
-          }} />
+          <div onClick={() => setDrawerOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-30" />
         )}
 
-        <div style={{
-          position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 70, display: 'flex',
-          transform: drawerOpen ? 'translateX(0)' : 'translateX(-100%)',
-          transition: 'transform 0.2s ease',
-          boxShadow: drawerOpen ? '2px 0 16px rgba(0,0,0,0.3)' : 'none',
-        }}>
+        <div className={`fixed top-0 bottom-0 left-0 z-40 flex transition-transform duration-200 ${
+          drawerOpen ? 'translate-x-0' : '-translate-x-full'
+        } ${drawerOpen ? 'shadow-lg' : ''}`}>
           {sidebar}
         </div>
 
-        <main style={{ paddingTop: '56px', minHeight: '100vh' }}>{children}</main>
+        <main className="pt-14 min-h-screen">{children}</main>
       </div>
     )
   }
 
   // ── Desktop ─────────────────────────────────────────────────────────────────
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: COLORS.bg }}>
+    <div className="flex min-h-screen bg-gray-50">
       {sidebar}
-      <main style={{ flex: 1, minWidth: 0, overflow: 'auto' }}>{children}</main>
+      <main className="flex-1 min-w-0 overflow-auto">{children}</main>
     </div>
   )
 }

@@ -5,12 +5,21 @@ import { createClient } from '@/lib/supabase/client'
 import { JobStatusBadge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
-import { COLORS, FONT_SIZE, RADIUS } from '@/lib/constants'
 import type { ScrapingJob } from '@googlebusinessdata/shared-types'
 
 interface JobProgressPanelProps {
   initialJob: ScrapingJob
   onResultsUpdate: () => void
+}
+
+function percentWidthClass(percent: number) {
+  if (percent <= 0) return 'w-0'
+  if (percent >= 100) return 'w-full'
+  const steps = [
+    'w-1/12', 'w-1/6', 'w-1/4', 'w-1/3', 'w-5/12', 'w-1/2',
+    'w-7/12', 'w-2/3', 'w-3/4', 'w-5/6', 'w-11/12',
+  ]
+  return steps[Math.min(steps.length - 1, Math.floor(percent / (100 / steps.length)))]
 }
 
 export function JobProgressPanel({ initialJob, onResultsUpdate }: JobProgressPanelProps) {
@@ -66,22 +75,16 @@ export function JobProgressPanel({ initialJob, onResultsUpdate }: JobProgressPan
     : 0
 
   return (
-    <div style={{
-      backgroundColor: COLORS.bgCard,
-      border: `1px solid ${COLORS.border}`,
-      borderRadius: RADIUS.lg,
-      padding: '20px 24px',
-      marginBottom: '24px',
-    }}>
+    <div className="bg-bgCard border border-border rounded-lg px-6 py-5 mb-6">
       {/* Row 1: query + status */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '16px' }}>
+      <div className="flex items-start justify-between gap-4 mb-4">
         <div>
-          <h2 style={{ margin: '0 0 4px', fontSize: FONT_SIZE.lg, fontWeight: '700', color: COLORS.text }}>
+          <h2 className="m-0 mb-1 text-lg font-bold text-text">
             {job.query}
           </h2>
-          <span style={{ fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>📍 {job.location}</span>
+          <span className="text-sm text-textMuted">📍 {job.location}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+        <div className="flex items-center gap-2.5 flex-shrink-0">
           <JobStatusBadge status={job.status} />
           {isRunning && (
             <Button variant="secondary" size="sm" loading={cancelling} onClick={handleCancel}>
@@ -92,15 +95,15 @@ export function JobProgressPanel({ initialJob, onResultsUpdate }: JobProgressPan
       </div>
 
       {/* Stats row */}
-      <div style={{ display: 'flex', gap: '32px', marginBottom: isRunning ? '16px' : '0' }}>
+      <div className={`flex gap-8 ${isRunning ? 'mb-4' : ''}`}>
         {[
           { label: 'Bulunan', value: job.total_found },
           { label: 'Çekilen', value: job.scraped_count },
           { label: 'Kalan',   value: Math.max(0, job.total_found - job.scraped_count) },
         ].map(stat => (
           <div key={stat.label}>
-            <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted }}>{stat.label}</div>
-            <div style={{ fontSize: FONT_SIZE.xl, fontWeight: '700', color: COLORS.text, lineHeight: 1.2 }}>
+            <div className="text-xs text-textMuted">{stat.label}</div>
+            <div className="text-xl font-bold text-text leading-tight">
               {stat.value.toLocaleString('tr-TR')}
             </div>
           </div>
@@ -110,16 +113,10 @@ export function JobProgressPanel({ initialJob, onResultsUpdate }: JobProgressPan
       {/* Progress bar */}
       {isRunning && (
         <div>
-          <div style={{ height: '6px', backgroundColor: COLORS.border, borderRadius: '3px', overflow: 'hidden' }}>
-            <div style={{
-              height: '100%',
-              width: `${percent}%`,
-              backgroundColor: COLORS.primary,
-              borderRadius: '3px',
-              transition: 'width 0.4s ease',
-            }} />
+          <div className="h-1.5 bg-border rounded overflow-hidden">
+            <div className={`h-full bg-blue-500 rounded transition-all ${percentWidthClass(percent)}`} />
           </div>
-          <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted, marginTop: '6px' }}>
+          <div className="text-xs text-textMuted mt-1.5">
             {percent}% tamamlandı
             {job.status === 'pending' && ' · Extension bağlanması bekleniyor...'}
           </div>
@@ -127,13 +124,7 @@ export function JobProgressPanel({ initialJob, onResultsUpdate }: JobProgressPan
       )}
 
       {job.status === 'failed' && job.error_message && (
-        <div style={{
-          marginTop: '12px', padding: '10px 14px',
-          backgroundColor: COLORS.dangerLight,
-          border: `1px solid #FCA5A5`,
-          borderRadius: RADIUS.md,
-          fontSize: FONT_SIZE.sm, color: COLORS.danger,
-        }}>
+        <div className="mt-3 p-3.5 bg-dangerLight border border-red-300 rounded-md text-sm text-danger">
           Hata: {job.error_message}
         </div>
       )}

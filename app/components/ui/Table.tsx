@@ -1,10 +1,9 @@
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 import type { ReactNode } from 'react'
 
 interface Column<T> {
   key: string
   header: string
-  width?: string
+  widthClass?: string
   render?: (row: T) => ReactNode
 }
 
@@ -18,24 +17,12 @@ interface TableProps<T> {
 
 export function Table<T>({ columns, data, keyField, emptyMessage = 'Veri yok.', loading }: TableProps<T>) {
   return (
-    <div style={{ overflowX: 'auto', width: '100%' }}>
-      <table style={{
-        width: '100%',
-        borderCollapse: 'collapse',
-        fontSize: FONT_SIZE.sm,
-      }}>
+    <div className="overflow-x-auto w-full">
+      <table className="w-full border-collapse text-sm">
         <thead>
-          <tr style={{ backgroundColor: COLORS.bg }}>
+          <tr className="bg-bg">
             {columns.map(col => (
-              <th key={col.key} style={{
-                padding: '10px 12px',
-                textAlign: 'left',
-                fontWeight: '600',
-                color: COLORS.textMuted,
-                borderBottom: `2px solid ${COLORS.border}`,
-                whiteSpace: 'nowrap',
-                width: col.width,
-              }}>
+              <th key={col.key} className={`px-3 py-2.5 text-left font-semibold text-textMuted border-b-2 border-border whitespace-nowrap ${col.widthClass ?? ''}`}>
                 {col.header}
               </th>
             ))}
@@ -44,23 +31,23 @@ export function Table<T>({ columns, data, keyField, emptyMessage = 'Veri yok.', 
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={columns.length} style={{ padding: '32px', textAlign: 'center', color: COLORS.textMuted }}>
+              <td colSpan={columns.length} className="p-8 text-center text-textMuted">
                 Yükleniyor...
               </td>
             </tr>
           ) : data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} style={{ padding: '32px', textAlign: 'center', color: COLORS.textMuted }}>
+              <td colSpan={columns.length} className="p-8 text-center text-textMuted">
                 {emptyMessage}
               </td>
             </tr>
           ) : data.map(row => (
             <tr
               key={String(row[keyField])}
-              style={{ borderBottom: `1px solid ${COLORS.border}` }}
+              className="border-b border-border"
             >
               {columns.map(col => (
-                <td key={col.key} style={{ padding: '12px', color: COLORS.text, verticalAlign: 'middle' }}>
+                <td key={col.key} className="px-3 py-3 text-text align-middle">
                   {col.render ? col.render(row) : String((row as Record<string, unknown>)[col.key] ?? '-')}
                 </td>
               ))}

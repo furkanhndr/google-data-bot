@@ -1,36 +1,28 @@
-import { COLORS } from '@/lib/constants'
-
 interface SpinnerProps {
   size?: number
   color?: string
 }
 
-export function Spinner({ size = 20, color = COLORS.primary }: SpinnerProps) {
+const sizeClasses: Record<number, string> = {
+  20: 'w-5 h-5',
+  32: 'w-8 h-8',
+}
+
+const colorClasses: Record<string, string> = {
+  '#2563EB': 'border-blue-200 border-t-primary',
+  '#16A34A': 'border-green-200 border-t-success',
+  '#DC2626': 'border-red-200 border-t-danger',
+}
+
+export function Spinner({ size = 20, color = '#2563EB' }: SpinnerProps) {
   return (
-    <>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      <span style={{
-        display: 'inline-block',
-        width: size,
-        height: size,
-        border: `2px solid ${color}33`,
-        borderTopColor: color,
-        borderRadius: '50%',
-        animation: 'spin 0.6s linear infinite',
-        flexShrink: 0,
-      }} />
-    </>
+    <span className={`inline-block rounded-full flex-shrink-0 animate-spin border-2 ${sizeClasses[size] ?? 'w-5 h-5'} ${colorClasses[color] ?? 'border-blue-200 border-t-primary'}`} />
   )
 }
 
 export function PageSpinner() {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '200px',
-    }}>
+    <div className="flex items-center justify-center min-h-200">
       <Spinner size={32} />
     </div>
   )

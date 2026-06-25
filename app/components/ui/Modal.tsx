@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import { COLORS, FONT_SIZE, RADIUS, SHADOW } from '@/lib/constants'
 import type { ReactNode } from 'react'
 
 interface ModalProps {
@@ -10,6 +9,11 @@ interface ModalProps {
   title: string
   children: ReactNode
   width?: number
+}
+
+const widthClasses: Record<number, string> = {
+  460: 'max-w-[460px]',
+  480: 'max-w-[480px]',
 }
 
 export function Modal({ open, onClose, title, children, width = 480 }: ModalProps) {
@@ -27,44 +31,22 @@ export function Modal({ open, onClose, title, children, width = 480 }: ModalProp
       {/* Overlay */}
       <div
         onClick={onClose}
-        style={{
-          position: 'fixed', inset: 0,
-          backgroundColor: 'rgba(0,0,0,0.45)',
-          zIndex: 100,
-        }}
+        className="fixed inset-0 bg-black bg-opacity-45 z-50"
       />
       {/* Dialog */}
-      <div style={{
-        position: 'fixed',
-        top: '50%', left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '100%',
-        maxWidth: width,
-        backgroundColor: COLORS.bgCard,
-        borderRadius: RADIUS.xl,
-        boxShadow: SHADOW.lg,
-        zIndex: 101,
-        overflow: 'hidden',
-      }}>
+      <div className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full bg-bgCard rounded-xl shadow-lg z-50 overflow-hidden ${widthClasses[width] ?? 'max-w-[480px]'}`}>
         {/* Header */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '20px 24px',
-          borderBottom: `1px solid ${COLORS.border}`,
-        }}>
-          <h2 style={{ margin: 0, fontSize: FONT_SIZE.lg, fontWeight: '600', color: COLORS.text }}>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+          <h2 className="m-0 text-lg font-semibold text-text">
             {title}
           </h2>
           <button
             onClick={onClose}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: COLORS.textMuted, fontSize: '20px', lineHeight: 1, padding: '2px',
-            }}
+            className="bg-none border-none cursor-pointer text-textMuted text-xl leading-none p-0.5"
           >×</button>
         </div>
         {/* Body */}
-        <div style={{ padding: '24px' }}>
+        <div className="p-6">
           {children}
         </div>
       </div>

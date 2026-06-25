@@ -182,7 +182,8 @@ onMessage(async (msg: ExtensionMessage) => {
         userId:       user.id,
         email:        user.email,
         role:         profile?.role,
-        creditsTotal: profile?.credits_total ?? 100,
+        plan:         profile?.plan ?? null,
+        creditsTotal: profile?.plan === 'premium' ? Infinity : (profile?.credits_total ?? 100),
         creditsUsed:  profile?.credits_used ?? 0,
       }
     }

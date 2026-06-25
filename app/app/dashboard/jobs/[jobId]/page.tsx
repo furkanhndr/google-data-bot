@@ -8,7 +8,6 @@ import { ResultsTable } from '@/components/dashboard/ResultsTable'
 import { ExportPanel } from '@/components/dashboard/ExportPanel'
 import { EnrichPanel } from '@/components/dashboard/EnrichPanel'
 import { PageSpinner } from '@/components/ui/Spinner'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 import type { ScrapingJob, BusinessResult } from '@googlebusinessdata/shared-types'
 
 export default function JobDetailPage() {
@@ -79,17 +78,13 @@ export default function JobDetailPage() {
     return () => { supabase.removeChannel(channel) }
   }, [jobId])
 
-  if (loading) return <div style={{ padding: '32px' }}><PageSpinner /></div>
+  if (loading) return <div className="p-8"><PageSpinner /></div>
   if (!job)    return notFound()
 
   return (
-    <div style={{ padding: '32px' }}>
+    <div className="p-8">
       {/* Back link */}
-      <a href="/dashboard/jobs" style={{
-        display: 'inline-flex', alignItems: 'center', gap: '4px',
-        color: COLORS.textMuted, fontSize: FONT_SIZE.sm,
-        textDecoration: 'none', marginBottom: '20px',
-      }}>
+      <a href="/dashboard/jobs" className="inline-flex items-center gap-1 text-textMuted text-sm no-underline mb-5">
         ← İşler
       </a>
 
@@ -105,10 +100,7 @@ export default function JobDetailPage() {
       )}
 
       {/* Results table */}
-      <div style={{
-        fontSize: FONT_SIZE.lg, fontWeight: '600',
-        color: COLORS.text, margin: '24px 0 12px',
-      }}>
+      <div className="text-lg font-semibold text-text mt-6 mb-3">
         Sonuçlar
       </div>
       <ResultsTable results={results} total={total} />

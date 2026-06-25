@@ -1,6 +1,5 @@
 'use client'
 
-import { COLORS, FONT_SIZE, RADIUS } from '@/lib/constants'
 import type { ReactNode } from 'react'
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost'
@@ -13,33 +12,17 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
 }
 
-const variantStyles: Record<Variant, React.CSSProperties> = {
-  primary: {
-    backgroundColor: COLORS.primary,
-    color: '#fff',
-    border: 'none',
-  },
-  secondary: {
-    backgroundColor: '#fff',
-    color: COLORS.text,
-    border: `1px solid ${COLORS.border}`,
-  },
-  danger: {
-    backgroundColor: COLORS.danger,
-    color: '#fff',
-    border: 'none',
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-    color: COLORS.textMuted,
-    border: 'none',
-  },
+const variantClasses: Record<Variant, string> = {
+  primary: 'bg-primary text-white border-none',
+  secondary: 'bg-white text-text border border-border',
+  danger: 'bg-danger text-white border-none',
+  ghost: 'bg-transparent text-textMuted border-none',
 }
 
-const sizeStyles: Record<Size, React.CSSProperties> = {
-  sm: { padding: '5px 10px', fontSize: FONT_SIZE.xs },
-  md: { padding: '8px 16px', fontSize: FONT_SIZE.sm },
-  lg: { padding: '11px 20px', fontSize: FONT_SIZE.base },
+const sizeClasses: Record<Size, string> = {
+  sm: 'px-2.5 py-1.25 text-xs',
+  md: 'px-4 py-2 text-sm',
+  lg: 'px-5 py-2.75 text-base',
 }
 
 export function Button({
@@ -48,7 +31,7 @@ export function Button({
   loading = false,
   disabled,
   children,
-  style,
+  className = '',
   ...props
 }: ButtonProps) {
   const isDisabled = disabled || loading
@@ -56,33 +39,13 @@ export function Button({
   return (
     <button
       disabled={isDisabled}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '6px',
-        fontWeight: '500',
-        borderRadius: RADIUS.md,
-        cursor: isDisabled ? 'not-allowed' : 'pointer',
-        opacity: isDisabled ? 0.6 : 1,
-        transition: 'opacity 0.15s, background-color 0.15s',
-        whiteSpace: 'nowrap',
-        ...variantStyles[variant],
-        ...sizeStyles[size],
-        ...style,
-      }}
+      className={`inline-flex items-center justify-center gap-1.5 font-medium rounded-md cursor-pointer transition-all whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed ${
+        variantClasses[variant]
+      } ${sizeClasses[size]} ${className}`}
       {...props}
     >
       {loading && (
-        <span style={{
-          width: '12px',
-          height: '12px',
-          border: '2px solid currentColor',
-          borderTopColor: 'transparent',
-          borderRadius: '50%',
-          display: 'inline-block',
-          animation: 'spin 0.6s linear infinite',
-        }} />
+        <span className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
       )}
       {children}
     </button>

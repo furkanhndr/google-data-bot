@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail]     = useState('')
@@ -34,12 +33,12 @@ export default function ForgotPasswordPage() {
   if (sent) {
     return (
       <>
-        <h1 style={titleStyle}>E-postanı kontrol et</h1>
-        <p style={{ margin: '0 0 24px', fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>
+        <h1 className="mb-2 text-2xl font-bold text-text">E-postanı kontrol et</h1>
+        <p className="mb-6 text-sm text-textMuted">
           <strong>{email}</strong> adresine bir şifre sıfırlama bağlantısı gönderdik.
           Bağlantı kısa süre içinde gelmezse spam klasörünü kontrol et.
         </p>
-        <Link href="/auth/login" style={{ color: COLORS.primary, textDecoration: 'none', fontWeight: '500', fontSize: FONT_SIZE.sm }}>
+        <Link href="/auth/login" className="text-sm text-primary no-underline font-medium hover:underline">
           ← Girişe dön
         </Link>
       </>
@@ -48,40 +47,35 @@ export default function ForgotPasswordPage() {
 
   return (
     <>
-      <h1 style={titleStyle}>Şifremi Unuttum</h1>
-      <p style={{ margin: '0 0 28px', fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>
+      <h1 className="mb-2 text-2xl font-bold text-text">Şifremi Unuttum</h1>
+      <p className="mb-7 text-sm text-textMuted">
         Hesabının e-postasını gir, sıfırlama bağlantısı gönderelim.
       </p>
 
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '24px' }}>
-          <label style={labelStyle}>E-posta</label>
+        <div className="mb-6">
+          <label className="block mb-1.5 text-sm font-medium text-text">E-posta</label>
           <input
             type="email" value={email} onChange={e => setEmail(e.target.value)} required
-            placeholder="ornek@sirket.com" style={inputStyle}
+            placeholder="ornek@sirket.com"
+            className="w-full px-3 py-[9px] border border-border rounded-lg text-base text-text bg-white outline-none box-border"
           />
         </div>
 
         {error && (
-          <div style={errorBoxStyle}>{error}</div>
+          <div className="mb-4 p-3 bg-dangerLight border border-red-300 rounded-md text-sm text-danger">{error}</div>
         )}
 
-        <button type="submit" disabled={loading} style={buttonStyle(loading)}>
+        <button type="submit" disabled={loading} className="w-full p-2.5 bg-primary text-white border-none rounded-lg text-base font-semibold cursor-pointer disabled:bg-textLight disabled:cursor-not-allowed">
           {loading ? 'Gönderiliyor...' : 'Sıfırlama Bağlantısı Gönder'}
         </button>
       </form>
 
-      <p style={{ marginTop: '24px', textAlign: 'center', fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>
-        <Link href="/auth/login" style={{ color: COLORS.primary, textDecoration: 'none', fontWeight: '500' }}>
+      <p className="mt-6 text-center text-sm text-textMuted">
+        <Link href="/auth/login" className="text-primary no-underline font-medium hover:underline">
           ← Girişe dön
         </Link>
       </p>
     </>
   )
 }
-
-const titleStyle: React.CSSProperties = { margin: '0 0 8px', fontSize: FONT_SIZE['2xl'], fontWeight: '700', color: COLORS.text }
-const labelStyle: React.CSSProperties = { display: 'block', marginBottom: '6px', fontSize: FONT_SIZE.sm, fontWeight: '500', color: COLORS.text }
-const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', border: `1px solid ${COLORS.border}`, borderRadius: '8px', fontSize: FONT_SIZE.base, color: COLORS.text, backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box' }
-const errorBoxStyle: React.CSSProperties = { marginBottom: '16px', padding: '12px', backgroundColor: COLORS.dangerLight, border: `1px solid #FCA5A5`, borderRadius: '6px', fontSize: FONT_SIZE.sm, color: COLORS.danger }
-const buttonStyle = (loading: boolean): React.CSSProperties => ({ width: '100%', padding: '10px', backgroundColor: loading ? COLORS.textLight : COLORS.primary, color: '#fff', border: 'none', borderRadius: '8px', fontSize: FONT_SIZE.base, fontWeight: '600', cursor: loading ? 'not-allowed' : 'pointer' })

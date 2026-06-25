@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -42,39 +41,37 @@ export default function ResetPasswordPage() {
 
   return (
     <>
-      <h1 style={titleStyle}>Yeni Şifre Belirle</h1>
-      <p style={{ margin: '0 0 28px', fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>
+      <h1 className="mb-2 text-2xl font-bold text-text">Yeni Şifre Belirle</h1>
+      <p className="mb-7 text-sm text-textMuted">
         Hesabın için yeni bir şifre gir.
       </p>
 
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={labelStyle}>Yeni Şifre</label>
+        <div className="mb-4">
+          <label className="block mb-1.5 text-sm font-medium text-text">Yeni Şifre</label>
           <input
             type="password" value={password} onChange={e => setPassword(e.target.value)} required
-            placeholder="En az 8 karakter" style={inputStyle} disabled={!ready}
+            placeholder="En az 8 karakter"
+            className="w-full px-3 py-[9px] border border-border rounded-lg text-base text-text bg-white outline-none box-border disabled:bg-bg"
+            disabled={!ready}
           />
         </div>
-        <div style={{ marginBottom: '24px' }}>
-          <label style={labelStyle}>Yeni Şifre (Tekrar)</label>
+        <div className="mb-6">
+          <label className="block mb-1.5 text-sm font-medium text-text">Yeni Şifre (Tekrar)</label>
           <input
             type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required
-            placeholder="••••••••" style={inputStyle} disabled={!ready}
+            placeholder="••••••••"
+            className="w-full px-3 py-[9px] border border-border rounded-lg text-base text-text bg-white outline-none box-border disabled:bg-bg"
+            disabled={!ready}
           />
         </div>
 
-        {error && <div style={errorBoxStyle}>{error}</div>}
+        {error && <div className="mb-4 p-3 bg-dangerLight border border-red-300 rounded-md text-sm text-danger">{error}</div>}
 
-        <button type="submit" disabled={loading || !ready} style={buttonStyle(loading || !ready)}>
+        <button type="submit" disabled={loading || !ready} className="w-full p-2.5 bg-primary text-white border-none rounded-lg text-base font-semibold cursor-pointer disabled:bg-textLight disabled:cursor-not-allowed">
           {loading ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
         </button>
       </form>
     </>
   )
 }
-
-const titleStyle: React.CSSProperties = { margin: '0 0 8px', fontSize: FONT_SIZE['2xl'], fontWeight: '700', color: COLORS.text }
-const labelStyle: React.CSSProperties = { display: 'block', marginBottom: '6px', fontSize: FONT_SIZE.sm, fontWeight: '500', color: COLORS.text }
-const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', border: `1px solid ${COLORS.border}`, borderRadius: '8px', fontSize: FONT_SIZE.base, color: COLORS.text, backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box' }
-const errorBoxStyle: React.CSSProperties = { marginBottom: '16px', padding: '12px', backgroundColor: COLORS.dangerLight, border: `1px solid #FCA5A5`, borderRadius: '6px', fontSize: FONT_SIZE.sm, color: COLORS.danger }
-const buttonStyle = (disabled: boolean): React.CSSProperties => ({ width: '100%', padding: '10px', backgroundColor: disabled ? COLORS.textLight : COLORS.primary, color: '#fff', border: 'none', borderRadius: '8px', fontSize: FONT_SIZE.base, fontWeight: '600', cursor: disabled ? 'not-allowed' : 'pointer' })

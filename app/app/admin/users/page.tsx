@@ -1,6 +1,5 @@
 import { createServiceClient } from '@/lib/supabase/server'
 import { UserTable } from '@/components/admin/UserTable'
-import { COLORS, FONT_SIZE } from '@/lib/constants'
 import type { UserWithEmail } from '@googlebusinessdata/shared-types'
 
 export default async function AdminUsersPage() {
@@ -21,11 +20,11 @@ export default async function AdminUsersPage() {
   }))
 
   return (
-    <div style={{ padding: '32px' }}>
-      <h1 style={{ margin: '0 0 8px', fontSize: FONT_SIZE['2xl'], fontWeight: '700', color: COLORS.text }}>
+    <div className="p-8">
+      <h1 className="mb-2 text-2xl font-bold text-text">
         Kullanıcılar
       </h1>
-      <p style={{ margin: '0 0 24px', fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>
+      <p className="mb-6 text-sm text-textMuted">
         {users.length} kullanıcı
       </p>
       <UserTable users={users} />

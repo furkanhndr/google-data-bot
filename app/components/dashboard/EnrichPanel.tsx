@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
-import { COLORS, FONT_SIZE, RADIUS } from '@/lib/constants'
 
 interface EnrichPanelProps {
   jobId: string
@@ -64,23 +63,12 @@ export function EnrichPanel({ jobId, onComplete }: EnrichPanelProps) {
   const done = progress ? progress.remaining === 0 : false
 
   return (
-    <div style={{
-      backgroundColor: COLORS.primaryLight,
-      border: `1px solid #BFDBFE`,
-      borderRadius: RADIUS.lg,
-      padding: '16px 20px',
-      marginBottom: '24px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: '16px',
-      flexWrap: 'wrap',
-    }}>
+    <div className="bg-primaryLight border border-blue-200 rounded-lg px-5 py-4 mb-6 flex items-center justify-between gap-4 flex-wrap">
       <div>
-        <div style={{ fontWeight: '600', color: COLORS.primary, fontSize: FONT_SIZE.sm }}>
+        <div className="font-semibold text-primary text-sm">
           ✉ E-posta zenginleştirme
         </div>
-        <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted, marginTop: '2px' }}>
+        <div className="text-xs text-textMuted mt-0.5">
           {progress
             ? `${progress.withWebsite.toLocaleString('tr-TR')} işletmenin web sitesi var · ` +
               `${progress.found.toLocaleString('tr-TR')} e-posta bulundu` +

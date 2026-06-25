@@ -7,7 +7,6 @@ import { Modal } from '@/components/ui/Modal'
 import { Input } from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
 import { useRouter } from 'next/navigation'
-import { COLORS, FONT_SIZE, RADIUS } from '@/lib/constants'
 import type { UserWithEmail } from '@googlebusinessdata/shared-types'
 
 function formatDate(iso: string) {
@@ -48,19 +47,22 @@ function EditUserModal({ user, onClose, onSaved }: EditModalProps) {
 
   return (
     <Modal open title={`Düzenle: ${user.email}`} onClose={onClose} width={460}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="flex flex-col gap-4">
 
         {/* Role */}
         <div>
-          <label style={{ fontSize: FONT_SIZE.sm, fontWeight: '500', color: COLORS.text, display: 'block', marginBottom: '6px' }}>Rol</label>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <label className="text-sm font-medium text-text block mb-1.5">Rol</label>
+          <div className="flex gap-2">
             {(['customer', 'admin'] as const).map(r => (
-              <button key={r} onClick={() => setRole(r)} style={{
-                flex: 1, padding: '8px', border: `2px solid ${role === r ? COLORS.primary : COLORS.border}`,
-                borderRadius: RADIUS.md, cursor: 'pointer', fontWeight: role === r ? '600' : '400',
-                backgroundColor: role === r ? COLORS.primaryLight : '#fff',
-                color: role === r ? COLORS.primary : COLORS.text, fontSize: FONT_SIZE.sm,
-              }}>
+              <button
+                key={r}
+                onClick={() => setRole(r)}
+                className={`flex-1 p-2 border-2 rounded-md cursor-pointer text-sm ${
+                  role === r
+                    ? 'border-primary bg-primaryLight text-primary font-semibold'
+                    : 'border-border bg-white text-text font-normal'
+                }`}
+              >
                 {r === 'admin' ? 'Admin' : 'Kullanıcı'}
               </button>
             ))}
@@ -69,15 +71,18 @@ function EditUserModal({ user, onClose, onSaved }: EditModalProps) {
 
         {/* Plan */}
         <div>
-          <label style={{ fontSize: FONT_SIZE.sm, fontWeight: '500', color: COLORS.text, display: 'block', marginBottom: '6px' }}>Plan</label>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <label className="text-sm font-medium text-text block mb-1.5">Plan</label>
+          <div className="flex gap-2">
             {(['free', 'premium'] as const).map(p => (
-              <button key={p} onClick={() => setPlan(p)} style={{
-                flex: 1, padding: '8px', border: `2px solid ${plan === p ? '#D97706' : COLORS.border}`,
-                borderRadius: RADIUS.md, cursor: 'pointer', fontWeight: plan === p ? '600' : '400',
-                backgroundColor: plan === p ? '#FFFBEB' : '#fff',
-                color: plan === p ? '#D97706' : COLORS.text, fontSize: FONT_SIZE.sm,
-              }}>
+              <button
+                key={p}
+                onClick={() => setPlan(p)}
+                className={`flex-1 p-2 border-2 rounded-md cursor-pointer text-sm ${
+                  plan === p
+                    ? 'border-warning bg-warningLight text-warning font-semibold'
+                    : 'border-border bg-white text-text font-normal'
+                }`}
+              >
                 {p === 'premium' ? '⭐ Premium' : 'Ücretsiz'}
               </button>
             ))}
@@ -94,23 +99,23 @@ function EditUserModal({ user, onClose, onSaved }: EditModalProps) {
         />
 
         {/* Suspend toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', backgroundColor: isSuspended ? COLORS.dangerLight : COLORS.bg, borderRadius: RADIUS.md, border: `1px solid ${isSuspended ? '#FCA5A5' : COLORS.border}` }}>
+        <div className={`flex items-center justify-between px-3.5 py-2.5 rounded-md border ${isSuspended ? 'bg-dangerLight border-red-300' : 'bg-bg border-border'}`}>
           <div>
-            <div style={{ fontSize: FONT_SIZE.sm, fontWeight: '500', color: COLORS.text }}>Hesap Askıya Alma</div>
-            <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted }}>Kullanıcı giriş yapamaz ve yeni iş oluşturamaz</div>
+            <div className="text-sm font-medium text-text">Hesap Askıya Alma</div>
+            <div className="text-xs text-textMuted">Kullanıcı giriş yapamaz ve yeni iş oluşturamaz</div>
           </div>
-          <button onClick={() => setIsSuspended(!isSuspended)} style={{
-            padding: '6px 14px', borderRadius: RADIUS.md, border: 'none', cursor: 'pointer',
-            backgroundColor: isSuspended ? COLORS.danger : COLORS.border,
-            color: isSuspended ? '#fff' : COLORS.textMuted,
-            fontSize: FONT_SIZE.sm, fontWeight: '600',
-          }}>
+          <button
+            onClick={() => setIsSuspended(!isSuspended)}
+            className={`px-3.5 py-1.5 rounded-md border-none cursor-pointer text-sm font-semibold ${
+              isSuspended ? 'bg-danger text-white' : 'bg-border text-textMuted'
+            }`}
+          >
             {isSuspended ? 'Askıda' : 'Aktif'}
           </button>
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '4px' }}>
+        <div className="flex gap-2.5 justify-end mt-1">
           <Button variant="secondary" onClick={onClose}>İptal</Button>
           <Button loading={loading} onClick={handleSave}>Kaydet</Button>
         </div>
@@ -135,66 +140,58 @@ export function UserTable({ users: initialUsers }: { users: UserWithEmail[] }) {
   return (
     <>
       {/* Search */}
-      <div style={{ marginBottom: '16px' }}>
+      <div className="mb-4">
         <input
           placeholder="E-posta veya isim ara..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{
-            padding: '8px 14px', border: `1px solid ${COLORS.border}`,
-            borderRadius: RADIUS.md, fontSize: FONT_SIZE.sm, outline: 'none',
-            width: '280px',
-          }}
+          className="px-3.5 py-2 border border-border rounded-md text-sm outline-none w-[280px]"
         />
       </div>
 
       {/* Table */}
-      <div style={{ overflowX: 'auto', border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.md, backgroundColor: COLORS.bgCard }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: FONT_SIZE.sm }}>
+      <div className="overflow-x-auto border border-border rounded-md bg-bgCard">
+        <table className="w-full border-collapse text-sm">
           <thead>
-            <tr style={{ backgroundColor: COLORS.bg }}>
+            <tr className="bg-bg">
               {['E-posta', 'Ad', 'Rol', 'Plan', 'Kredi', 'Durum', 'Kayıt', ''].map(h => (
-                <th key={h} style={{
-                  padding: '10px 14px', textAlign: 'left', fontWeight: '600',
-                  color: COLORS.textMuted, borderBottom: `2px solid ${COLORS.border}`,
-                  whiteSpace: 'nowrap',
-                }}>{h}</th>
+                <th key={h} className="px-3.5 py-2.5 text-left font-semibold text-textMuted border-b-2 border-border whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ padding: '40px', textAlign: 'center', color: COLORS.textMuted }}>
+                <td colSpan={8} className="p-10 text-center text-textMuted">
                   Kullanıcı bulunamadı.
                 </td>
               </tr>
             ) : filtered.map(u => (
-              <tr key={u.id} style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-                <td style={{ padding: '10px 14px', color: COLORS.text, fontWeight: '500' }}>{u.email}</td>
-                <td style={{ padding: '10px 14px', color: COLORS.textMuted }}>{u.display_name ?? '—'}</td>
-                <td style={{ padding: '10px 14px' }}>
+              <tr key={u.id} className="border-b border-border">
+                <td className="px-3.5 py-2.5 text-text font-medium">{u.email}</td>
+                <td className="px-3.5 py-2.5 text-textMuted">{u.display_name ?? '—'}</td>
+                <td className="px-3.5 py-2.5">
                   <Badge variant={u.role === 'admin' ? 'info' : 'default'}>
                     {u.role === 'admin' ? 'Admin' : 'Kullanıcı'}
                   </Badge>
                 </td>
-                <td style={{ padding: '10px 14px' }}>
+                <td className="px-3.5 py-2.5">
                   <Badge variant={u.plan === 'premium' ? 'warning' : 'default'}>
                     {u.plan === 'premium' ? '⭐ Premium' : 'Ücretsiz'}
                   </Badge>
                 </td>
-                <td style={{ padding: '10px 14px', color: COLORS.text }}>
+                <td className="px-3.5 py-2.5 text-text">
                   {u.credits_used} / {u.credits_total}
                 </td>
-                <td style={{ padding: '10px 14px' }}>
+                <td className="px-3.5 py-2.5">
                   <Badge variant={u.is_suspended ? 'danger' : 'success'}>
                     {u.is_suspended ? 'Askıda' : 'Aktif'}
                   </Badge>
                 </td>
-                <td style={{ padding: '10px 14px', color: COLORS.textMuted, whiteSpace: 'nowrap' }}>
+                <td className="px-3.5 py-2.5 text-textMuted whitespace-nowrap">
                   {formatDate(u.created_at)}
                 </td>
-                <td style={{ padding: '10px 14px' }}>
+                <td className="px-3.5 py-2.5">
                   <Button size="sm" variant="secondary" onClick={() => setEditingUser(u)}>
                     Düzenle
                   </Button>
