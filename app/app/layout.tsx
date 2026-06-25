@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { COLORS } from '@/lib/constants'
 import { ToastProvider } from '@/components/ui/Toast'
@@ -6,6 +6,11 @@ import { ToastProvider } from '@/components/ui/Toast'
 export const metadata: Metadata = {
   title: 'Google Business Data',
   description: 'Google Maps business data scraping platform',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {

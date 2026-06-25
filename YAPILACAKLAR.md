@@ -106,6 +106,17 @@ Canlıya alırken yapılması gerekenler (kod hazır, sadece yapılandırma):
 
 ## ✅ Tamamlanan
 
+### Mobil uyumluluk (kullanıcı paneli)
+- **Responsive DashboardLayout** ([DashboardLayout](app/components/layout/DashboardLayout.tsx)) —
+  mobilde (<768px) üst bar + soldan kayan drawer (hamburger menü, karartma overlay),
+  masaüstünde sabit sidebar. [useMediaQuery](app/lib/hooks/useMediaQuery.ts) hook'u.
+- **Responsive grid'ler** — overview + JobForm sabit kolonlar `auto-fit`'e çevrildi
+  (dar ekranda tek kolona iner).
+- **Viewport meta** root layout'a eklendi. Bonus: avatar artık sidebar'da da görünüyor.
+- Playwright ile 375px genişlikte görsel doğrulandı (overview + drawer).
+- ⏳ **Kalan:** tam Tailwind geçişi (tüm inline style'lar) ayrı büyük bir refactor;
+  admin paneli mobil uyumu henüz yapılmadı.
+
 ### Dashboard genel bakış + bildirimler
 - **Genel Bakış sayfası** ([dashboard/page.tsx](app/app/dashboard/page.tsx)) —
   istatistik kartları (toplam/tamamlanan iş, toplam sonuç, kalan kredi),

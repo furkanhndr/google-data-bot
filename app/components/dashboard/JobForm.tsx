@@ -62,7 +62,7 @@ export function JobForm() {
           İş Detayları
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '20px' }}>
           <Input
             label="Arama Sorgusu"
             placeholder="örn: Diş kliniği, Restoran, Avukat"
@@ -81,7 +81,7 @@ export function JobForm() {
           />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '24px' }}>
           {/* Category */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <label style={{ fontSize: FONT_SIZE.sm, fontWeight: '500', color: COLORS.text }}>
