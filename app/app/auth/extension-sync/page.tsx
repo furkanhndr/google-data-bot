@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { PageSpinner } from '@/components/ui/Spinner'
 
-export default function ExtensionSyncPage() {
+function ExtensionSyncContent() {
   const router       = useRouter()
   const searchParams = useSearchParams()
   const redirectTo   = searchParams.get('redirectTo') ?? '/dashboard'
@@ -31,5 +31,13 @@ export default function ExtensionSyncPage() {
     <div className="flex items-center justify-center h-screen">
       <PageSpinner />
     </div>
+  )
+}
+
+export default function ExtensionSyncPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen"><PageSpinner /></div>}>
+      <ExtensionSyncContent />
+    </Suspense>
   )
 }
