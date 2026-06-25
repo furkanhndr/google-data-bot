@@ -106,6 +106,16 @@ Canlıya alırken yapılması gerekenler (kod hazır, sadece yapılandırma):
 
 ## ✅ Tamamlanan
 
+### Sonuç tablosu — kopyalama butonu
+- Telefon ve (dolu olduğunda) e-posta hücrelerine **📋 kopyala** butonu
+  ([ResultsTable](app/components/dashboard/ResultsTable.tsx)); panoya kopyalar,
+  kısa ✓ geri bildirim, satır tıklamasını engellemez.
+
+### Sidebar tam-yükseklik düzeltmesi
+- Mobil drawer için eklenen `height:100%` masaüstü flex-stretch'i bozuyordu
+  (sidebar kısa kalıyordu). Kaldırıldı; mobil sarmalayıcıya `display:flex` eklendi.
+  Hem Dashboard hem Admin layout.
+
 ### Test altyapısı + CI
 - **Vitest** kuruldu, 16 test geçiyor: `buildSearchTerm` (kategori dedupe),
   `email-enrich` (mailto `<br` temizleme, blocklist, rol-adresi önceliği,

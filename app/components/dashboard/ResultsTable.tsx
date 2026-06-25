@@ -23,6 +23,33 @@ const EMAIL_STATUS_HINT: Record<string, string> = {
   pending:    'aranıyor…',
 }
 
+// Small inline button that copies a value to the clipboard with brief feedback.
+function CopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false)
+  return (
+    <button
+      type="button"
+      title="Kopyala"
+      aria-label="Kopyala"
+      onClick={e => {
+        e.stopPropagation()
+        navigator.clipboard?.writeText(value).then(() => {
+          setCopied(true)
+          setTimeout(() => setCopied(false), 1200)
+        }).catch(() => {})
+      }}
+      style={{
+        background: 'none', border: 'none', cursor: 'pointer',
+        padding: '2px', marginLeft: '4px', flexShrink: 0, lineHeight: 1,
+        fontSize: FONT_SIZE.xs,
+        color: copied ? COLORS.success : COLORS.textLight,
+      }}
+    >
+      {copied ? '✓' : '📋'}
+    </button>
+  )
+}
+
 function CellValue({ col, row }: { col: string; row: BusinessResult }) {
   const val = (row as unknown as Record<string, unknown>)[col]
 
@@ -39,12 +66,24 @@ function CellValue({ col, row }: { col: string; row: BusinessResult }) {
 
   if (col === 'email') {
     return (
-      <a href={`mailto:${String(val)}`}
-        style={{ color: COLORS.primary, fontSize: FONT_SIZE.xs }}
-        onClick={e => e.stopPropagation()}
-      >
-        {String(val)}
-      </a>
+      <span style={{ display: 'inline-flex', alignItems: 'center', maxWidth: '100%' }}>
+        <a href={`mailto:${String(val)}`}
+          style={{ color: COLORS.primary, fontSize: FONT_SIZE.xs, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          onClick={e => e.stopPropagation()}
+        >
+          {String(val)}
+        </a>
+        <CopyButton value={String(val)} />
+      </span>
+    )
+  }
+
+  if (col === 'phone') {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+        <span style={{ whiteSpace: 'nowrap' }}>{String(val)}</span>
+        <CopyButton value={String(val)} />
+      </span>
     )
   }
 

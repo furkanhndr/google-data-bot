@@ -41,7 +41,6 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
     <aside style={{
       width: '240px',
       minWidth: '240px',
-      height: '100%',
       backgroundColor: COLORS.sidebar,
       display: 'flex',
       flexDirection: 'column',
@@ -160,7 +159,7 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
 
         {/* Drawer */}
         <div style={{
-          position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 70,
+          position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 70, display: 'flex',
           transform: drawerOpen ? 'translateX(0)' : 'translateX(-100%)',
           transition: 'transform 0.2s ease',
           boxShadow: drawerOpen ? '2px 0 16px rgba(0,0,0,0.3)' : 'none',
