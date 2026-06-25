@@ -15,9 +15,11 @@
     "build:types": "npm run build --workspace=packages/shared-types",
     "build": "npm run build:types && npm run build:app && npm run build:extension",
     "scraper": "npm run start --workspace=@googlebusinessdata/scraper-service",
-    "type-check": "tsc --noEmit -p tsconfig.base.json"
+    "type-check": "npm run type-check --workspace=app && npm run type-check --workspace=extension && npm run type-check --workspace=@googlebusinessdata/scraper-service",
+    "test": "vitest run"
   },
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^2.1.0"
   }
 }

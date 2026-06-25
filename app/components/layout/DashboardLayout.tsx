@@ -88,7 +88,7 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
           <span style={{ fontSize: FONT_SIZE.xs, color: COLORS.sidebarText }}>Krediler</span>
           <span style={{ fontSize: FONT_SIZE.xs, color: '#fff', fontWeight: '600' }}>
-            {profile.credits_used} / {profile.credits_total === Infinity ? '∞' : profile.credits_total}
+            {profile.credits_used} / {profile.plan === 'premium' ? '∞' : profile.credits_total}
           </span>
         </div>
         {profile.plan === 'free' && (

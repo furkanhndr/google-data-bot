@@ -54,21 +54,29 @@ export default async function SettingsPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
               <span style={{ fontSize: FONT_SIZE.sm, color: COLORS.textMuted }}>Kredi Kullanımı</span>
               <span style={{ fontSize: FONT_SIZE.sm, fontWeight: '600', color: COLORS.text }}>
-                {profile?.credits_used ?? 0} / {profile?.credits_total ?? 100}
+                {profile?.credits_used ?? 0} / {profile?.plan === 'premium' ? '∞' : (profile?.credits_total ?? 100)}
               </span>
             </div>
-            <div style={{ height: '8px', backgroundColor: COLORS.border, borderRadius: '4px' }}>
-              <div style={{
-                height: '100%',
-                width: `${creditsPercent}%`,
-                backgroundColor: creditsPercent > 80 ? COLORS.danger : COLORS.primary,
-                borderRadius: '4px',
-                transition: 'width 0.3s',
-              }} />
-            </div>
-            <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted, marginTop: '6px' }}>
-              {Math.max(0, (profile?.credits_total ?? 100) - (profile?.credits_used ?? 0))} kredi kaldı
-            </div>
+            {profile?.plan === 'premium' ? (
+              <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted }}>
+                Premium planında kredi limiti yoktur.
+              </div>
+            ) : (
+              <>
+                <div style={{ height: '8px', backgroundColor: COLORS.border, borderRadius: '4px' }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${creditsPercent}%`,
+                    backgroundColor: creditsPercent > 80 ? COLORS.danger : COLORS.primary,
+                    borderRadius: '4px',
+                    transition: 'width 0.3s',
+                  }} />
+                </div>
+                <div style={{ fontSize: FONT_SIZE.xs, color: COLORS.textMuted, marginTop: '6px' }}>
+                  {Math.max(0, (profile?.credits_total ?? 100) - (profile?.credits_used ?? 0))} kredi kaldı
+                </div>
+              </>
+            )}
           </div>
         </div>
       </Card>

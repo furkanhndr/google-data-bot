@@ -106,6 +106,22 @@ Canlıya alırken yapılması gerekenler (kod hazır, sadece yapılandırma):
 
 ## ✅ Tamamlanan
 
+### Test altyapısı + CI
+- **Vitest** kuruldu, 16 test geçiyor: `buildSearchTerm` (kategori dedupe),
+  `email-enrich` (mailto `<br` temizleme, blocklist, rol-adresi önceliği,
+  concurrency), `extractor` saf fonksiyonları (`extractCity`, `extractPostalCode`).
+- **GitHub Actions** ([ci.yml](.github/workflows/ci.yml)) — push/PR'da install +
+  extractor build + type-check (app/extension/scraper-service) + test.
+- `buildSearchTerm` test edilebilir saf modüle çıkarıldı ([search-term.ts](scraper-service/src/search-term.ts)).
+
+### Admin paneli mobil
+- [AdminLayout](app/components/layout/AdminLayout.tsx) responsive drawer'a çevrildi
+  (DashboardLayout ile aynı desen).
+
+### Premium kredi gösterimi düzeltmesi
+- Premium planda kredi `106 / 100` yerine `106 / ∞` gösteriliyor (sidebar + Ayarlar);
+  premium'da ilerleme çubuğu/"kaldı" gizlendi. (YAPILACAKLAR #10 kısmen kapandı.)
+
 ### Mobil uyumluluk (kullanıcı paneli)
 - **Responsive DashboardLayout** ([DashboardLayout](app/components/layout/DashboardLayout.tsx)) —
   mobilde (<768px) üst bar + soldan kayan drawer (hamburger menü, karartma overlay),

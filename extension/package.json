@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "webpack --mode production",
-    "dev": "webpack --mode development --watch"
+    "dev": "webpack --mode development --watch",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@googlebusinessdata/shared-types": "*",

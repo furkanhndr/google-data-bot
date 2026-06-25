@@ -1,6 +1,7 @@
 import { chromium, type Browser, type BrowserContext } from 'playwright'
 import type { BusinessResult } from '@googlebusinessdata/shared-types'
 import { config } from './config.ts'
+import { buildSearchTerm } from './search-term.ts'
 import { EXTRACTOR_SOURCE } from './generated/extractor-source.ts'
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
@@ -18,15 +19,6 @@ export interface ScrapeOptions {
   // Called as rows are extracted so the caller can stream them to the DB.
   onBatch: (rows: Partial<BusinessResult>[]) => Promise<void>
   isCancelled?: () => Promise<boolean>
-}
-
-// Builds the Google Maps search term from query + optional category + location,
-// avoiding duplicate words (e.g. query already contains the category).
-function buildSearchTerm(query: string, category: string | null | undefined, location: string): string {
-  const parts = [query]
-  if (category && !query.toLowerCase().includes(category.toLowerCase())) parts.push(category)
-  parts.push(location)
-  return parts.join(' ').trim()
 }
 
 let browserSingleton: Browser | null = null
