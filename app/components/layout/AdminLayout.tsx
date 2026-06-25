@@ -30,7 +30,7 @@ export function AdminLayout({ children, email }: { children: ReactNode; email: s
   const sidebar = (
     <aside className="w-60 flex-shrink-0 bg-gray-800 flex flex-col">
       {/* Logo */}
-      <div className="px-5 py-4 border-b border-white border-opacity-5">
+      <div className="px-5 py-4 border-b border-white/5">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-purple-600 rounded flex items-center justify-center text-white text-sm font-bold">A</div>
           <div>
@@ -48,8 +48,8 @@ export function AdminLayout({ children, email }: { children: ReactNode; email: s
             <Link key={item.href} href={item.href} className="no-underline block" onClick={() => setDrawerOpen(false)}>
               <div className={`flex items-center gap-2.5 px-5 py-2.5 transition-colors ${
                 active
-                  ? 'bg-purple-600 bg-opacity-25 border-l-3 border-purple-600 text-white font-semibold'
-                  : 'border-l-3 border-transparent text-slate-300 font-normal hover:bg-gray-700'
+                  ? 'bg-purple-600/25 border-l-[3px] border-purple-600 text-white font-semibold'
+                  : 'border-l-[3px] border-transparent text-slate-300 font-normal hover:bg-gray-700'
               }`}>
                 <span className="text-base">{item.icon}</span>
                 {item.label}
@@ -60,7 +60,7 @@ export function AdminLayout({ children, email }: { children: ReactNode; email: s
       </nav>
 
       {/* User + logout */}
-      <div className="px-4 py-3 border-t border-white border-opacity-5 flex items-center gap-2.5">
+      <div className="px-4 py-3 border-t border-white/5 flex items-center gap-2.5">
         <div className="w-7.5 h-7.5 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
           {email[0].toUpperCase()}
         </div>
@@ -82,7 +82,7 @@ export function AdminLayout({ children, email }: { children: ReactNode; email: s
         </header>
 
         {drawerOpen && (
-          <div onClick={() => setDrawerOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-30" />
+          <div onClick={() => setDrawerOpen(false)} className="fixed inset-0 bg-black/50 z-30" />
         )}
 
         <div className={`fixed top-0 bottom-0 left-0 z-40 flex transition-transform duration-200 ${

@@ -143,7 +143,7 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
           placeholder="İsim, şehir veya kategori ara..."
           value={search}
           onChange={e => handleSearch(e.target.value)}
-          className="px-3 py-1.75 border border-border rounded-md text-sm outline-none w-64"
+          className="px-3 py-[7px] border border-border rounded-md text-sm outline-none w-64"
         />
       </div>
 

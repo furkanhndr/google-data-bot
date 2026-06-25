@@ -51,7 +51,7 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
   const sidebar = (
     <aside className="w-60 flex-shrink-0 bg-gray-800 flex flex-col">
       {/* Logo */}
-      <div className="px-5 py-4 border-b border-white border-opacity-10">
+      <div className="px-5 py-4 border-b border-white/10">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white text-base font-bold">
             G
@@ -69,7 +69,7 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
               <div className={`
                 flex items-center gap-2.5 px-5 py-2.5 border-l-[3px] transition-colors
                 ${active 
-                  ? 'bg-blue-600 bg-opacity-25 border-blue-500 text-white font-semibold' 
+                  ? 'bg-blue-600/25 border-blue-500 text-white font-semibold' 
                   : 'border-transparent text-gray-300 font-normal hover:bg-gray-700'
                 }
               `}>
@@ -82,7 +82,7 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
       </nav>
 
       {/* Credits widget */}
-      <div className="mx-3 mb-3 p-3 bg-white bg-opacity-6 rounded-lg">
+      <div className="mx-3 mb-3 p-3 bg-white/6 rounded-lg">
         <div className="flex justify-between mb-1.5">
           <span className="text-xs text-gray-300">Krediler</span>
           <span className="text-xs text-white font-semibold">
@@ -90,7 +90,7 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
           </span>
         </div>
         {profile.plan === 'free' && (
-          <div className="h-1 bg-white bg-opacity-15 rounded-sm overflow-hidden">
+          <div className="h-1 bg-white/15 rounded-sm overflow-hidden">
             <div className={`
               h-full transition-all rounded-sm
               ${creditsPercent > 80 ? 'bg-red-500' : 'bg-blue-500'}
@@ -106,7 +106,7 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
       </div>
 
       {/* User + logout */}
-      <div className="px-4 py-3 border-t border-white border-opacity-10 flex items-center gap-2.5">
+      <div className="px-4 py-3 border-t border-white/10 flex items-center gap-2.5">
         <div className="w-7.5 h-7.5 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
           {profile.avatar_url
             ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -143,7 +143,7 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
         {/* Overlay */}
         {drawerOpen && (
           <div onClick={() => setDrawerOpen(false)} className="
-            fixed inset-0 bg-black bg-opacity-50 z-60
+            fixed inset-0 bg-black/50 z-60
           " />
         )}
 

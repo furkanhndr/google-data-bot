@@ -31,7 +31,7 @@ export function Modal({ open, onClose, title, children, width = 480 }: ModalProp
       {/* Overlay */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-black bg-opacity-45 z-50"
+        className="fixed inset-0 bg-black/45 z-50"
       />
       {/* Dialog */}
       <div className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full bg-bgCard rounded-xl shadow-lg z-50 overflow-hidden ${widthClasses[width] ?? 'max-w-[480px]'}`}>
