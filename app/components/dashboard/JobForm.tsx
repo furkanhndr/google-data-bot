@@ -20,7 +20,7 @@ export function JobForm() {
   const [query,      setQuery]      = useState('')
   const [location,   setLocation]   = useState('')
   const [category,   setCategory]   = useState('')
-  const [maxResults, setMaxResults] = useState(100)
+  const [maxResults, setMaxResults] = useState(60)
   const [minRating,  setMinRating]  = useState('')
   const [loading,    setLoading]    = useState(false)
 
@@ -105,9 +105,9 @@ export function JobForm() {
             <input
               type="number"
               min={1}
-              max={5000}
+              max={60}
               value={maxResults}
-              onChange={e => setMaxResults(parseInt(e.target.value) || 100)}
+              onChange={e => setMaxResults(Math.min(60, parseInt(e.target.value) || 60))}
               className="px-3 py-2 border border-border rounded-lg text-base text-text bg-white outline-none"
             />
           </div>

@@ -10,6 +10,11 @@ export const config = {
   supabaseUrl:        required('SUPABASE_URL'),
   supabaseServiceKey: required('SUPABASE_SERVICE_ROLE_KEY'),
 
+  // Data source: 'places' = official Google Places API (default),
+  // 'scrape' = legacy Playwright scraping (kept but disabled by default).
+  provider:     (process.env.SCRAPE_PROVIDER ?? 'places') as 'places' | 'scrape',
+  placesApiKey: process.env.PLACES_API_KEY,
+
   // Empty string → run without a proxy (direct connection).
   proxyServer:    process.env.PROXY_SERVER?.trim() || undefined,
 

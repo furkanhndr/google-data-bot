@@ -11,10 +11,15 @@ async function shutdown(signal: string) {
 process.on('SIGINT',  () => shutdown('SIGINT'))
 process.on('SIGTERM', () => shutdown('SIGTERM'))
 
+if (config.provider === 'places' && !config.placesApiKey) {
+  console.error('[scraper-service] fatal: SCRAPE_PROVIDER=places ama PLACES_API_KEY tanımlı değil.')
+  process.exit(1)
+}
+
 console.log('[scraper-service] starting', {
+  provider: config.provider,
   concurrency: config.jobConcurrency,
   proxy: config.proxyServer ? 'on' : 'off',
-  headless: config.headless,
 })
 
 runWorkerLoop().catch(err => {

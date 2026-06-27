@@ -57,15 +57,19 @@ export const SHADOW = {
 } as const
 
 // ── Plan limits ──────────────────────────────────────────────
+// Google Places API returns at most 60 results per search query, so per-job
+// result counts are capped at 60 for every plan. Plans differ by credits.
+export const PLACES_MAX_RESULTS = 60
+
 export const PLAN_LIMITS = {
-  free:    { credits: 100,      maxResultsPerJob: 100 },
-  premium: { credits: Infinity, maxResultsPerJob: 5000 },
+  free:    { credits: 100,      maxResultsPerJob: PLACES_MAX_RESULTS },
+  premium: { credits: Infinity, maxResultsPerJob: PLACES_MAX_RESULTS },
 } as const
 
 // ── Scraping ─────────────────────────────────────────────────
 export const SCRAPE_BATCH_SIZE = 10
-export const MAX_RESULTS_FREE  = 100
-export const MAX_RESULTS_PREMIUM = 5000
+export const MAX_RESULTS_FREE  = PLACES_MAX_RESULTS
+export const MAX_RESULTS_PREMIUM = PLACES_MAX_RESULTS
 
 // ── Export ───────────────────────────────────────────────────
 export const EXPORT_SIGNED_URL_EXPIRY = 60 * 60 // 1 hour in seconds

@@ -1,10 +1,15 @@
 import type { ScrapingJob } from '@googlebusinessdata/shared-types'
 import { findEmailForWebsite, mapWithConcurrency } from '@googlebusinessdata/shared-utils'
 import { supabase } from './supabase.ts'
-import { scrape } from './scraper.ts'
+import { scrape, type ScrapeOptions } from './scraper.ts'
+import { searchPlaces } from './places.ts'
 import { config } from './config.ts'
 
-const MAX_RESULTS_FALLBACK = 100
+const MAX_RESULTS_FALLBACK = 60
+
+// The collector: official Places API by default, legacy scraping if configured.
+const collect = (opts: ScrapeOptions): Promise<number> =>
+  config.provider === 'scrape' ? scrape(opts) : searchPlaces(opts)
 
 // Atomically claim a single pending job: only one worker can flip a given row
 // from 'pending' to 'running', so concurrent workers never grab the same job.
@@ -45,7 +50,7 @@ export async function processJob(job: ScrapingJob): Promise<void> {
   let insertedTotal = 0
 
   try {
-    await scrape({
+    await collect({
       query: job.query,
       location: job.location,
       maxResults,

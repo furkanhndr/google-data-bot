@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       location: location.trim(),
       filters:  safeFilters,
       status:   'pending',
-      source:   'extension',
+      source:   'places_api',
     })
     .select()
     .single()

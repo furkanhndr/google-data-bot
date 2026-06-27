@@ -1,18 +1,28 @@
 # Scraper Service
 
-Harici (server-side) Google Maps scraping servisi. Tarayıcı eklentisi yerine
-backend'de **Playwright** ile çalışır → Chrome Web Store riski ve kullanıcının
-Google hesabının banlanma riski yoktur.
+İşletme verisi toplama servisi. **Varsayılan kaynak: resmi Google Places API
+(New)** — yasal, izinli ve kararlı. Eski **Playwright scraping** yolu kodda
+duruyor ama varsayılan kapalı (`SCRAPE_PROVIDER=scrape` ile açılır).
 
-## Nasıl çalışır
+> ⚠️ **Önemli ürün kısıtı:** Places API sorgu başına **en fazla 60 sonuç**
+> döndürür. İş başına sonuç sayısı her planda 60 ile sınırlıdır.
 
-1. Supabase'de `status = 'pending'` olan işleri **atomik** olarak sahiplenir
-   (birden çok worker aynı işi almaz).
-2. Google Maps'te arama yapar, sonuç akışını kaydırıp işletme URL'lerini toplar.
-3. Her işletme URL'sine **doğrudan gider** (karta tıklamak güvenilmez) ve
-   paylaşılan [extractor](../extension/src/content/extractor.ts) ile veriyi çıkarır.
-4. Sonuçları batch'ler halinde `business_results`'a yazar; `scraped_count`'u
-   **gerçekten yazılan satır sayısıyla** günceller → kredi faturalandırması doğru.
+## Nasıl çalışır (Places API — varsayılan)
+
+1. Supabase'de `status = 'pending'` işleri **atomik** sahiplenir.
+2. Places API **Text Search (New)**'e tek sorgu atar; field-mask ile telefon,
+   web, puan, çalışma saatleri dahil tüm alanları **tek çağrıda** alır
+   (ayrı Place Details gerekmez → daha ucuz). 20'şer, en fazla 60 sonuç.
+3. [place-mapper](src/place-mapper.ts) ile `business_results` şemasına eşler.
+4. Sonuçları batch'ler halinde yazar; `scraped_count` = gerçekten yazılan satır.
+5. İş bitince web sitesi olan kayıtlar için e-posta zenginleştirmesi çalışır
+   (Places API e-posta vermez; bu adım web sitesinden bulur).
+
+## Eski yol (Playwright scraping)
+
+`SCRAPE_PROVIDER=scrape` ile etkinleşir. Google Maps'te arama → işletme URL'lerine
+doğrudan gidip [extractor](../extension/src/content/extractor.ts) ile çıkarır.
+Yasal risk (Google ToS) ve ölçekte bot tespiti taşır; sadece yedek/opsiyonel.
 
 > Extractor tek kaynaktan gelir: `scripts/build-extractor.mjs`, eklentideki
 > `extractor.ts`'i tarayıcıya enjekte edilebilir bir JS string'ine derler.
