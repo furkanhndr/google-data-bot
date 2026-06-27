@@ -11,8 +11,5 @@ export async function GET(request: NextRequest) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  // Route through extension-sync so the Chrome extension can pick up the session token
-  const syncUrl = new URL(`${origin}/auth/extension-sync`)
-  syncUrl.searchParams.set('redirectTo', redirectTo)
-  return NextResponse.redirect(syncUrl.toString())
+  return NextResponse.redirect(new URL(redirectTo, origin).toString())
 }

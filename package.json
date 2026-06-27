@@ -4,18 +4,14 @@
   "private": true,
   "workspaces": [
     "app",
-    "extension",
-    "scraper-service",
     "packages/*"
   ],
   "scripts": {
     "dev": "npm run dev --workspace=app",
     "build:app": "npm run build --workspace=app",
-    "build:extension": "npm run build --workspace=extension",
     "build:types": "npm run build --workspace=packages/shared-types",
-    "build": "npm run build:types && npm run build:app && npm run build:extension",
-    "scraper": "npm run start --workspace=@googlebusinessdata/scraper-service",
-    "type-check": "npm run type-check --workspace=app && npm run type-check --workspace=extension && npm run type-check --workspace=@googlebusinessdata/scraper-service",
+    "build": "npm run build:types && npm run build:app",
+    "type-check": "npm run type-check --workspace=app",
     "test": "vitest run"
   },
   "devDependencies": {

@@ -1,7 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { searchPlaces } from '@/lib/places'
 import { MAX_RESULTS_FREE, MAX_RESULTS_PREMIUM } from '@/lib/constants'
 import type { JobFilters } from '@googlebusinessdata/shared-types'
+
+// Places API search + DB writes run within the request — allow up to 60s.
+export const maxDuration = 60
 
 // GET /api/jobs — list current user's jobs
 export async function GET(request: NextRequest) {
@@ -67,17 +71,48 @@ export async function POST(request: NextRequest) {
   const { data: job, error } = await supabase
     .from('scraping_jobs')
     .insert({
-      user_id:  user.id,
-      query:    query.trim(),
-      location: location.trim(),
-      filters:  safeFilters,
-      status:   'pending',
-      source:   'places_api',
+      user_id:    user.id,
+      query:      query.trim(),
+      location:   location.trim(),
+      filters:    safeFilters,
+      status:     'running',
+      source:     'places_api',
+      started_at: new Date().toISOString(),
     })
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error || !job) return NextResponse.json({ error: error?.message ?? 'Job oluşturulamadı.' }, { status: 500 })
 
-  return NextResponse.json({ job }, { status: 201 })
+  // Process the job inline via the Google Places API (no separate worker).
+  try {
+    const rows = await searchPlaces(query.trim(), location.trim(), safeFilters)
+
+    if (rows.length > 0) {
+      const payload = rows.map(r => ({ ...r, job_id: job.id, user_id: user.id }))
+      const { error: insertError } = await supabase.from('business_results').insert(payload)
+      if (insertError) throw new Error(insertError.message)
+    }
+
+    // scraped_count = rows actually written → the on-completion trigger bills
+    // credits accurately.
+    const { data: done } = await supabase
+      .from('scraping_jobs')
+      .update({ status: 'completed', scraped_count: rows.length, completed_at: new Date().toISOString() })
+      .eq('id', job.id)
+      .select()
+      .single()
+
+    return NextResponse.json({ job: done ?? job }, { status: 201 })
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e)
+    const { data: failed } = await supabase
+      .from('scraping_jobs')
+      .update({ status: 'failed', error_message: message, completed_at: new Date().toISOString() })
+      .eq('id', job.id)
+      .select()
+      .single()
+
+    return NextResponse.json({ job: failed ?? job, error: message }, { status: 201 })
+  }
 }
