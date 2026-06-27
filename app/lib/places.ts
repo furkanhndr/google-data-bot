@@ -119,6 +119,7 @@ export async function searchPlaces(
   query: string,
   location: string,
   filters: PlacesSearchFilters = {},
+  options: { onRequest?: () => void } = {},
 ): Promise<Partial<BusinessResult>[]> {
   const apiKey = process.env.PLACES_API_KEY
   if (!apiKey) throw new Error('PLACES_API_KEY is not set')
@@ -146,6 +147,7 @@ export async function searchPlaces(
         ...(pageToken ? { pageToken } : {}),
       }),
     })
+    options.onRequest?.()
 
     if (!res.ok) {
       throw new Error(`Places API ${res.status}: ${(await res.text()).slice(0, 300)}`)

@@ -1,13 +1,20 @@
 import type { UserPlan } from '@googlebusinessdata/shared-types'
+import {
+  PLACES_MAX_RESULTS,
+  PLACES_PAGE_SIZE,
+  PLACES_TEXT_SEARCH_COST_PER_REQUEST_USD,
+} from './constants'
 
 export const PLAN_LIMITS = {
   free: {
     credits: 100,
-    maxResultsPerJob: 100,
+    maxResultsPerJob: PLACES_MAX_RESULTS,
+    dailyJobs: 5,
   },
   premium: {
     credits: Infinity,
-    maxResultsPerJob: 5000,
+    maxResultsPerJob: PLACES_MAX_RESULTS,
+    dailyJobs: 50,
   },
 } as const
 
@@ -17,6 +24,10 @@ export function getPlanCreditsTotal(plan: UserPlan, storedCreditsTotal: number):
 
 export function getPlanMaxResults(plan: UserPlan): number {
   return PLAN_LIMITS[plan]?.maxResultsPerJob ?? PLAN_LIMITS.free.maxResultsPerJob
+}
+
+export function getPlanDailyJobLimit(plan: UserPlan): number {
+  return PLAN_LIMITS[plan]?.dailyJobs ?? PLAN_LIMITS.free.dailyJobs
 }
 
 export function formatPlanCreditsTotal(plan: UserPlan, storedCreditsTotal: number): string {
@@ -31,4 +42,13 @@ export function getCreditsPercent(plan: UserPlan, creditsUsed: number, storedCre
   if (plan === 'premium') return 100
   if (storedCreditsTotal <= 0) return 0
   return Math.min(100, Math.round((creditsUsed / storedCreditsTotal) * 100))
+}
+
+export function estimatePlacesRequests(maxResults: number): number {
+  const safeResults = Math.max(1, Math.min(PLACES_MAX_RESULTS, Math.ceil(maxResults)))
+  return Math.ceil(safeResults / PLACES_PAGE_SIZE)
+}
+
+export function estimatePlacesCostUsd(maxResults: number): number {
+  return estimatePlacesRequests(maxResults) * PLACES_TEXT_SEARCH_COST_PER_REQUEST_USD
 }

@@ -1,11 +1,37 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { searchPlaces } from '@/lib/places'
-import { MAX_RESULTS_FREE, MAX_RESULTS_PREMIUM } from '@/lib/constants'
+import {
+  MAX_RESULTS_FREE,
+  MAX_RESULTS_PREMIUM,
+  PLACES_TEXT_SEARCH_COST_PER_REQUEST_USD,
+} from '@/lib/constants'
+import { getCreditsRemaining, getPlanDailyJobLimit } from '@/lib/plan'
 import type { JobFilters } from '@googlebusinessdata/shared-types'
 
 // Places API search + DB writes run within the request — allow up to 60s.
 export const maxDuration = 60
+
+async function recordPlacesUsage(requests: number) {
+  if (requests <= 0) return
+  const service = await createServiceClient()
+  const today = new Date().toISOString().slice(0, 10)
+  const cost = requests * PLACES_TEXT_SEARCH_COST_PER_REQUEST_USD
+
+  const { data: existing } = await service
+    .from('places_api_quota')
+    .select('requests_made, cost_usd')
+    .eq('date', today)
+    .maybeSingle()
+
+  await service
+    .from('places_api_quota')
+    .upsert({
+      date: today,
+      requests_made: (existing?.requests_made ?? 0) + requests,
+      cost_usd: Number(existing?.cost_usd ?? 0) + cost,
+    }, { onConflict: 'date' })
+}
 
 // GET /api/jobs — list current user's jobs
 export async function GET(request: NextRequest) {
@@ -61,11 +87,35 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Arama sorgusu ve konum zorunludur.' }, { status: 400 })
   }
 
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  const { count: jobsToday } = await supabase
+    .from('scraping_jobs')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .gte('created_at', todayStart.toISOString())
+
+  const dailyLimit = getPlanDailyJobLimit(profile.plan)
+  if ((jobsToday ?? 0) >= dailyLimit) {
+    return NextResponse.json({
+      error: `Günlük arama limitinize ulaştınız. Limit: ${dailyLimit} iş/gün.`,
+    }, { status: 429 })
+  }
+
   // Clamp max_results by plan
   const maxAllowed = profile.plan === 'premium' ? MAX_RESULTS_PREMIUM : MAX_RESULTS_FREE
+  const remainingCredits = getCreditsRemaining(profile.plan, profile.credits_used, profile.credits_total)
+  const creditLimitedMax = Number.isFinite(remainingCredits)
+    ? Math.max(0, Math.min(maxAllowed, remainingCredits))
+    : maxAllowed
+
+  if (creditLimitedMax <= 0) {
+    return NextResponse.json({ error: 'Kredi limitinize ulaştınız.' }, { status: 403 })
+  }
+
   const safeFilters: JobFilters = {
     ...filters,
-    max_results: Math.min(filters.max_results ?? maxAllowed, maxAllowed),
+    max_results: Math.min(filters.max_results ?? creditLimitedMax, creditLimitedMax),
   }
 
   const { data: job, error } = await supabase
@@ -85,8 +135,12 @@ export async function POST(request: NextRequest) {
   if (error || !job) return NextResponse.json({ error: error?.message ?? 'Job oluşturulamadı.' }, { status: 500 })
 
   // Process the job inline via the Google Places API (no separate worker).
+  let placesRequests = 0
   try {
-    const rows = await searchPlaces(query.trim(), location.trim(), safeFilters)
+    const rows = await searchPlaces(query.trim(), location.trim(), safeFilters, {
+      onRequest: () => { placesRequests += 1 },
+    })
+    await recordPlacesUsage(placesRequests)
 
     if (rows.length > 0) {
       const payload = rows.map(r => ({ ...r, job_id: job.id, user_id: user.id }))
@@ -105,6 +159,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ job: done ?? job }, { status: 201 })
   } catch (e) {
+    await recordPlacesUsage(placesRequests)
     const message = e instanceof Error ? e.message : String(e)
     const { data: failed } = await supabase
       .from('scraping_jobs')

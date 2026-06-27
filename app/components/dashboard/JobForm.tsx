@@ -140,6 +140,16 @@ export function JobForm() {
           </span>
         </div>
 
+        <div className="px-4 py-3 mb-6 bg-warningLight border border-yellow-300 rounded-lg text-sm text-warning">
+          <div className="font-semibold mb-1">Kredi kullanımı</div>
+          <div>
+            Bu arama en fazla <strong>{maxResults}</strong> kredi harcar.
+          </div>
+          <div className="mt-1 text-xs text-textMuted">
+            Başarısız aramalarda kredi düşülmez; kredi yalnızca başarıyla kaydedilen sonuç kadar harcanır.
+          </div>
+        </div>
+
         <div className="flex gap-3 justify-end">
           <Button
             type="button"
