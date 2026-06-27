@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 
@@ -19,6 +19,7 @@ interface Progress {
 export function EnrichPanel({ jobId, onComplete }: EnrichPanelProps) {
   const [progress, setProgress] = useState<Progress | null>(null)
   const [running,  setRunning]  = useState(false)
+  const autoStarted = useRef(false)
   const { toast } = useToast()
 
   const loadProgress = useCallback(async () => {
@@ -28,7 +29,7 @@ export function EnrichPanel({ jobId, onComplete }: EnrichPanelProps) {
 
   useEffect(() => { loadProgress() }, [loadProgress])
 
-  async function handleEnrich() {
+  const handleEnrich = useCallback(async (auto = false) => {
     setRunning(true)
     let totalFound = 0
 
@@ -39,7 +40,7 @@ export function EnrichPanel({ jobId, onComplete }: EnrichPanelProps) {
         const data = await res.json()
 
         if (!res.ok) {
-          toast(data.error ?? 'Zenginleştirme başarısız.', 'error')
+          if (!auto) toast(data.error ?? 'Zenginleştirme başarısız.', 'error')
           break
         }
 
@@ -47,7 +48,7 @@ export function EnrichPanel({ jobId, onComplete }: EnrichPanelProps) {
         await loadProgress()
 
         if (data.remaining <= 0 || data.processed === 0) {
-          toast(`Tamamlandı — ${totalFound} e-posta bulundu.`, 'success')
+          if (totalFound > 0) toast(`${totalFound} e-posta bulundu.`, 'success')
           onComplete?.()
           break
         }
@@ -55,7 +56,16 @@ export function EnrichPanel({ jobId, onComplete }: EnrichPanelProps) {
     } finally {
       setRunning(false)
     }
-  }
+  }, [jobId, loadProgress, onComplete, toast])
+
+  // Auto-start enrichment once when the job has un-enriched results with websites.
+  useEffect(() => {
+    if (!progress || autoStarted.current || running) return
+    if (progress.remaining > 0 && progress.withWebsite > 0) {
+      autoStarted.current = true
+      handleEnrich(true)
+    }
+  }, [progress, running, handleEnrich])
 
   // Nothing to enrich — no website on any result.
   if (progress && progress.withWebsite === 0) return null
@@ -81,7 +91,7 @@ export function EnrichPanel({ jobId, onComplete }: EnrichPanelProps) {
         size="sm"
         loading={running}
         disabled={done}
-        onClick={handleEnrich}
+        onClick={() => handleEnrich()}
       >
         {done ? '✓ Tamamlandı' : running ? 'Taranıyor…' : 'E-postaları bul'}
       </Button>
