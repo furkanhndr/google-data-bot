@@ -7,6 +7,7 @@ import { JobProgressPanel } from '@/components/dashboard/JobProgressPanel'
 import { ResultsTable } from '@/components/dashboard/ResultsTable'
 import { ExportPanel } from '@/components/dashboard/ExportPanel'
 import { EnrichPanel } from '@/components/dashboard/EnrichPanel'
+import { CampaignCreatePanel } from '@/components/dashboard/CampaignCreatePanel'
 import { PageSpinner } from '@/components/ui/Spinner'
 import type { ScrapingJob, BusinessResult } from '@googlebusinessdata/shared-types'
 
@@ -95,6 +96,7 @@ export default function JobDetailPage() {
       {job.status === 'completed' && total > 0 && (
         <>
           <EnrichPanel jobId={jobId} onComplete={reloadResults} />
+          <CampaignCreatePanel jobId={jobId} defaultName={`${job.query} — ${job.location} kampanyası`} />
           <ExportPanel jobId={jobId} resultCount={total} />
         </>
       )}

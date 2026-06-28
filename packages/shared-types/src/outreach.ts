@@ -68,6 +68,38 @@ export interface LeadOutreachState {
   updated_at: string
 }
 
+export type CampaignStatus = 'draft' | 'running' | 'completed' | 'stopped' | 'failed'
+
+export interface Campaign {
+  id: string
+  user_id: string
+  name: string
+  channel: 'email'
+  template_id: string | null
+  status: CampaignStatus
+  daily_limit: number
+  total_recipients: number
+  sent_count: number
+  failed_count: number
+  created_at: string
+  updated_at: string
+  started_at: string | null
+  completed_at: string | null
+}
+
+export type CampaignRecipientStatus = 'pending' | 'sent' | 'failed' | 'skipped'
+
+export interface CampaignRecipient {
+  id: string
+  campaign_id: string
+  user_id: string
+  business_result_id: string
+  status: CampaignRecipientStatus
+  error_message: string | null
+  sent_at: string | null
+  created_at: string
+}
+
 export interface OutreachEvent {
   id: string
   user_id: string

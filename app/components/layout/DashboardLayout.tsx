@@ -12,6 +12,7 @@ import type { UserProfile } from '@googlebusinessdata/shared-types'
 const NAV_ITEMS = [
   { href: '/dashboard',          label: 'Genel Bakış', icon: '📊', exact: true },
   { href: '/dashboard/jobs',     label: 'İşler',      icon: '⚡' },
+  { href: '/dashboard/campaigns', label: 'Kampanyalar', icon: '📣' },
   { href: '/dashboard/exports',  label: 'Dışa Aktarma', icon: '📤' },
   { href: '/dashboard/settings', label: 'Ayarlar',    icon: '⚙' },
 ]
