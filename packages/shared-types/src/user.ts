@@ -5,6 +5,7 @@ export interface UserProfile {
   id: string
   role: UserRole
   plan: UserPlan
+  premium_until: string | null
   credits_total: number
   credits_used: number
   display_name: string | null

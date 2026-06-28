@@ -1,6 +1,8 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { getEffectivePlan } from '@/lib/plan'
 import { ProfileSettings } from '@/components/settings/ProfileSettings'
 import { PasswordSettings } from '@/components/settings/PasswordSettings'
 import { DangerZone } from '@/components/settings/DangerZone'
@@ -60,8 +62,10 @@ export default async function SettingsPage() {
       }
     : null
 
+  const effectivePlan = profile ? getEffectivePlan(profile.plan, profile.premium_until) : 'free'
+
   const creditsPercent = profile
-    ? profile.plan === 'premium'
+    ? effectivePlan === 'premium'
       ? 100
       : Math.min(100, Math.round((profile.credits_used / profile.credits_total) * 100))
     : 0
@@ -103,19 +107,25 @@ export default async function SettingsPage() {
             <div className="flex flex-col gap-3.5">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-textMuted">Mevcut Plan</span>
-                <Badge variant={profile?.plan === 'premium' ? 'success' : 'default'}>
-                  {profile?.plan === 'premium' ? '⭐ Premium' : 'Ücretsiz'}
+                <Badge variant={effectivePlan === 'premium' ? 'success' : 'default'}>
+                  {effectivePlan === 'premium' ? '⭐ Premium' : 'Ücretsiz'}
                 </Badge>
               </div>
+
+              {effectivePlan === 'premium' && profile?.premium_until && (
+                <div className="text-xs text-textMuted">
+                  Premium bitiş: {new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(profile.premium_until))}
+                </div>
+              )}
 
               <div>
                 <div className="flex justify-between mb-1.5">
                   <span className="text-sm text-textMuted">Kredi Kullanımı</span>
                   <span className="text-sm font-semibold text-text">
-                    {profile?.credits_used ?? 0} / {profile?.plan === 'premium' ? '∞' : (profile?.credits_total ?? 100)}
+                    {profile?.credits_used ?? 0} / {effectivePlan === 'premium' ? '∞' : (profile?.credits_total ?? 100)}
                   </span>
                 </div>
-                {profile?.plan === 'premium' ? (
+                {effectivePlan === 'premium' ? (
                   <div className="text-xs text-textMuted">
                     Premium planında kredi limiti yoktur.
                   </div>
@@ -130,6 +140,13 @@ export default async function SettingsPage() {
                   </>
                 )}
               </div>
+
+              <Link
+                href="/dashboard/billing"
+                className="inline-flex items-center justify-center gap-1.5 self-start rounded-md bg-primary px-4 py-2 text-sm font-medium text-white no-underline"
+              >
+                {effectivePlan === 'premium' ? 'Premium\'u Uzat' : 'Premium\'a Yükselt'}
+              </Link>
             </div>
           </Card>
         )}

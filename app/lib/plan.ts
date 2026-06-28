@@ -20,6 +20,16 @@ export const PLAN_LIMITS = {
   },
 } as const
 
+// Premium is sold as a one-time 30-day pass (no recurring billing), tracked
+// via `profiles.premium_until`. A null expiry means the grant is permanent
+// (admin-granted premium), so `profiles.plan` alone can't be trusted once
+// purchases are involved — always go through this helper for plan-gated logic.
+export function getEffectivePlan(plan: UserPlan, premiumUntil: string | null): UserPlan {
+  if (plan !== 'premium') return 'free'
+  if (!premiumUntil) return 'premium'
+  return new Date(premiumUntil) > new Date() ? 'premium' : 'free'
+}
+
 export function getPlanCreditsTotal(plan: UserPlan, storedCreditsTotal: number): number {
   return plan === 'premium' ? Infinity : storedCreditsTotal
 }

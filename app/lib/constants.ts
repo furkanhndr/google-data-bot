@@ -68,6 +68,23 @@ export const PLACES_TEXT_SEARCH_COST_PER_REQUEST_USD = Number(
 // Plan limits (credits, daily job count, etc.) live in @/lib/plan — the single
 // source of truth — alongside the helpers that read them.
 
+// ── Billing (iyzico) ─────────────────────────────────────────
+// Premium is a one-time 30-day pass — no recurring/subscription billing.
+// The user pays again via the same checkout to renew.
+export const PREMIUM_PRICE_TRY = Number(process.env.PREMIUM_PRICE_TRY ?? '499')
+export const PREMIUM_PERIOD_DAYS = 30
+
+// One-time credit top-ups — independent of plan, usable by free and premium
+// accounts alike (a free user low on credits, or anyone who wants a burst
+// without waiting). Added straight to `profiles.credits_total`, never expire.
+export const CREDIT_PACKAGES = [
+  { id: 'credits_250',  credits: 250,  priceTRY: 199 },
+  { id: 'credits_1000', credits: 1000, priceTRY: 699 },
+  { id: 'credits_5000', credits: 5000, priceTRY: 2999 },
+] as const
+
+export type CreditPackageId = typeof CREDIT_PACKAGES[number]['id']
+
 // ── Scraping ─────────────────────────────────────────────────
 export const SCRAPE_BATCH_SIZE = 10
 export const MAX_RESULTS_FREE  = PLACES_MAX_RESULTS

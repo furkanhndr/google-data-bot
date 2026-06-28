@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { JobNotifier } from '@/components/layout/JobNotifier'
 import { useMediaQuery } from '@/lib/hooks/useMediaQuery'
+import { getEffectivePlan } from '@/lib/plan'
 import type { ReactNode } from 'react'
 import type { UserProfile } from '@googlebusinessdata/shared-types'
 
@@ -14,6 +15,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/jobs',     label: 'İşler',      icon: '⚡' },
   { href: '/dashboard/campaigns', label: 'Kampanyalar', icon: '📣' },
   { href: '/dashboard/exports',  label: 'Dışa Aktarma', icon: '📤' },
+  { href: '/dashboard/billing',  label: 'Faturalandırma', icon: '💳' },
   { href: '/dashboard/settings', label: 'Ayarlar',    icon: '⚙' },
 ]
 
@@ -45,7 +47,9 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
     router.refresh()
   }
 
-  const creditsPercent = profile.plan === 'premium'
+  const effectivePlan = getEffectivePlan(profile.plan, profile.premium_until)
+
+  const creditsPercent = effectivePlan === 'premium'
     ? 100
     : Math.min(100, Math.round((profile.credits_used / profile.credits_total) * 100))
 
@@ -105,10 +109,10 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
         <div className="flex justify-between mb-1.5">
           <span className="text-xs text-gray-300">Krediler</span>
           <span className="text-xs text-white font-semibold">
-            {profile.credits_used} / {profile.plan === 'premium' ? '∞' : profile.credits_total}
+            {profile.credits_used} / {effectivePlan === 'premium' ? '∞' : profile.credits_total}
           </span>
         </div>
-        {profile.plan === 'free' && (
+        {effectivePlan === 'free' && (
           <div className="h-1 bg-white/15 rounded-sm overflow-hidden">
             <div className={`
               h-full transition-all rounded-sm
@@ -118,8 +122,8 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
           </div>
         )}
         <div className="mt-1.5 text-xs text-gray-300">
-          Plan: <span className={`font-semibold ${profile.plan === 'premium' ? 'text-amber-400' : 'text-gray-400'}`}>
-            {profile.plan === 'premium' ? 'Premium' : 'Ücretsiz'}
+          Plan: <span className={`font-semibold ${effectivePlan === 'premium' ? 'text-amber-400' : 'text-gray-400'}`}>
+            {effectivePlan === 'premium' ? 'Premium' : 'Ücretsiz'}
           </span>
         </div>
       </div>

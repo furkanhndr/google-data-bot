@@ -6,7 +6,7 @@ import {
   MAX_RESULTS_PREMIUM,
   PLACES_TEXT_SEARCH_COST_PER_REQUEST_USD,
 } from '@/lib/constants'
-import { getCreditsRemaining, getPlanDailyJobLimit } from '@/lib/plan'
+import { getCreditsRemaining, getPlanDailyJobLimit, getEffectivePlan } from '@/lib/plan'
 import type { JobFilters } from '@googlebusinessdata/shared-types'
 
 // Places API search + DB writes run within the request — allow up to 60s.
@@ -66,13 +66,17 @@ export async function POST(request: NextRequest) {
   // Check suspension + credits
   const { data: profile } = await supabase
     .from('profiles')
-    .select('is_suspended, plan, credits_used, credits_total')
+    .select('is_suspended, plan, premium_until, credits_used, credits_total')
     .eq('id', user.id)
     .single()
 
   if (!profile) return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
   if (profile.is_suspended) return NextResponse.json({ error: 'Hesabınız askıya alınmış.' }, { status: 403 })
-  if (profile.plan === 'free' && profile.credits_used >= profile.credits_total) {
+
+  // `plan` can lag reality: a paid premium pass expires after 30 days even
+  // though the DB row still says 'premium' until something touches it.
+  const effectivePlan = getEffectivePlan(profile.plan, profile.premium_until)
+  if (effectivePlan === 'free' && profile.credits_used >= profile.credits_total) {
     return NextResponse.json({ error: 'Kredi limitinize ulaştınız.' }, { status: 403 })
   }
 
@@ -95,7 +99,7 @@ export async function POST(request: NextRequest) {
     .eq('user_id', user.id)
     .gte('created_at', todayStart.toISOString())
 
-  const dailyLimit = getPlanDailyJobLimit(profile.plan)
+  const dailyLimit = getPlanDailyJobLimit(effectivePlan)
   if ((jobsToday ?? 0) >= dailyLimit) {
     return NextResponse.json({
       error: `Günlük arama limitinize ulaştınız. Limit: ${dailyLimit} iş/gün.`,
@@ -103,8 +107,8 @@ export async function POST(request: NextRequest) {
   }
 
   // Clamp max_results by plan
-  const maxAllowed = profile.plan === 'premium' ? MAX_RESULTS_PREMIUM : MAX_RESULTS_FREE
-  const remainingCredits = getCreditsRemaining(profile.plan, profile.credits_used, profile.credits_total)
+  const maxAllowed = effectivePlan === 'premium' ? MAX_RESULTS_PREMIUM : MAX_RESULTS_FREE
+  const remainingCredits = getCreditsRemaining(effectivePlan, profile.credits_used, profile.credits_total)
   const creditLimitedMax = Number.isFinite(remainingCredits)
     ? Math.max(0, Math.min(maxAllowed, remainingCredits))
     : maxAllowed

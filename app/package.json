@@ -14,6 +14,7 @@
     "@googlebusinessdata/shared-utils": "*",
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.45.4",
+    "iyzipay": "^2.0.69",
     "next": "^15.3.2",
     "nodemailer": "^9.0.1",
     "react": "^19.0.0",

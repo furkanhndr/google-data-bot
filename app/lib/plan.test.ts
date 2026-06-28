@@ -5,6 +5,7 @@ import {
   formatPlanCreditsTotal,
   getCreditsPercent,
   getCreditsRemaining,
+  getEffectivePlan,
   getPlanDailyJobLimit,
   getPlanCreditsTotal,
   getPlanMaxResults,
@@ -48,5 +49,26 @@ describe('plan helpers', () => {
     expect(estimatePlacesRequests(21)).toBe(2)
     expect(estimatePlacesRequests(60)).toBe(3)
     expect(estimatePlacesCostUsd(60)).toBeCloseTo(0.096)
+  })
+
+  describe('getEffectivePlan', () => {
+    it('is always free when the stored plan is free', () => {
+      expect(getEffectivePlan('free', null)).toBe('free')
+      expect(getEffectivePlan('free', new Date(Date.now() + 86400000).toISOString())).toBe('free')
+    })
+
+    it('treats a null expiry as a permanent (e.g. admin-granted) premium', () => {
+      expect(getEffectivePlan('premium', null)).toBe('premium')
+    })
+
+    it('is premium while premium_until is in the future', () => {
+      const future = new Date(Date.now() + 86400000).toISOString()
+      expect(getEffectivePlan('premium', future)).toBe('premium')
+    })
+
+    it('falls back to free once premium_until has passed', () => {
+      const past = new Date(Date.now() - 86400000).toISOString()
+      expect(getEffectivePlan('premium', past)).toBe('free')
+    })
   })
 })

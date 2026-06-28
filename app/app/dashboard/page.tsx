@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Card, StatCard } from '@/components/ui/Card'
 import { JobStatusBadge } from '@/components/ui/Badge'
+import { getEffectivePlan } from '@/lib/plan'
 import type { ScrapingJob } from '@googlebusinessdata/shared-types'
 
 function chartBarHeightClass(value: number, max: number) {
@@ -24,7 +25,7 @@ export default async function OverviewPage() {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
   const [profileRes, totalJobs, completedJobs, totalResults, totalExports, recentRes, weekRes] = await Promise.all([
-    supabase.from('profiles').select('plan, credits_used, credits_total').eq('id', uid).single(),
+    supabase.from('profiles').select('plan, premium_until, credits_used, credits_total').eq('id', uid).single(),
     supabase.from('scraping_jobs').select('id', { count: 'exact', head: true }).eq('user_id', uid),
     supabase.from('scraping_jobs').select('id', { count: 'exact', head: true }).eq('user_id', uid).eq('status', 'completed'),
     supabase.from('business_results').select('id', { count: 'exact', head: true }).eq('user_id', uid),
@@ -34,6 +35,7 @@ export default async function OverviewPage() {
   ])
 
   const profile = profileRes.data
+  const effectivePlan = profile ? getEffectivePlan(profile.plan, profile.premium_until) : 'free'
   const recent  = (recentRes.data ?? []) as ScrapingJob[]
   const credremaining = profile ? Math.max(0, profile.credits_total - profile.credits_used) : 0
 
@@ -64,9 +66,9 @@ export default async function OverviewPage() {
         <StatCard label="Toplam Sonuç" value={(totalResults.count ?? 0).toLocaleString('tr-TR')} />
         <StatCard
           label="Kalan Kredi"
-          value={profile?.plan === 'premium' ? '∞' : credremaining}
-          sub={profile?.plan === 'premium' ? 'Premium' : `${profile?.credits_total ?? 0} krediden`}
-          color={credremaining === 0 && profile?.plan !== 'premium' ? '#DC2626' : '#2563EB'}
+          value={effectivePlan === 'premium' ? '∞' : credremaining}
+          sub={effectivePlan === 'premium' ? 'Premium' : `${profile?.credits_total ?? 0} krediden`}
+          color={credremaining === 0 && effectivePlan !== 'premium' ? '#DC2626' : '#2563EB'}
         />
       </div>
 
