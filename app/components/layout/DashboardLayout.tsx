@@ -128,6 +128,16 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
         </div>
       </div>
 
+      {/* Destek */}
+      <div className="px-3 mb-3">
+        <a
+          href="mailto:support@vintotap.com"
+          className="block px-2.5 py-1.5 text-xs text-gray-300 hover:text-white transition-colors no-underline"
+        >
+          ✉ Destek: support@vintotap.com
+        </a>
+      </div>
+
       {/* User + logout */}
       <div className="px-4 py-3 border-t border-white/10 flex items-center gap-2.5">
         <div className="w-7.5 h-7.5 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">

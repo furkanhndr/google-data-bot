@@ -17,7 +17,7 @@ export default function PrivacyPage() {
         <p>
           <strong>[ŞİRKET/İŞLETME UNVANI]</strong><br />
           Adres: <strong>[ADRES]</strong><br />
-          E-posta: <strong>[KVKK BAŞVURU E-POSTASI]</strong>
+          E-posta: <strong>support@vintotap.com</strong>
         </p>
       </section>
 
@@ -151,7 +151,7 @@ export default function PrivacyPage() {
           <li>Kanuna aykırı işlenme nedeniyle zarara uğramanız halinde zararın giderilmesini talep etme.</li>
         </ul>
         <p>
-          Bu haklarınızı kullanmak için <strong>[KVKK BAŞVURU E-POSTASI]</strong>
+          Bu haklarınızı kullanmak için <strong>support@vintotap.com</strong>
           adresine yazılı olarak başvurabilirsiniz. Hesap ayarlarınızdan
           profilinizi güncelleyebilir veya hesabınızı doğrudan silebilirsiniz.
         </p>

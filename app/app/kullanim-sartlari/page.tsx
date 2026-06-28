@@ -175,7 +175,7 @@ export default function TermsPage() {
       <section>
         <h2>11. İletişim</h2>
         <p>
-          Sorularınız için <strong>[DESTEK E-POSTASI]</strong> adresinden bizimle
+          Sorularınız için <strong>support@vintotap.com</strong> adresinden bizimle
           iletişime geçebilirsiniz.
         </p>
       </section>

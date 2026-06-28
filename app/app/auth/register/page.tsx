@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { AuthInput } from '@/components/auth/AuthInput'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -50,74 +51,69 @@ export default function RegisterPage() {
 
   return (
     <>
-      <h1 className="mb-2 text-2xl font-bold text-text">
+      <h1 className="mb-2 font-[family-name:var(--font-heading)] text-2xl font-semibold text-text">
         Hesap Oluştur
       </h1>
       <p className="mb-7 text-sm text-textMuted">
-        Ücretsiz hesabınızla 100 veri hakkı kazanın.
+        Ücretsiz hesabınızla <strong className="text-text">100 veri hakkı</strong> kazanın.
       </p>
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-1.5 text-sm font-medium text-text">Ad Soyad</label>
-          <input
-            type="text"
-            value={displayName}
-            onChange={e => setDisplayName(e.target.value)}
-            required
-            placeholder="Ali Veli"
-            className="w-full px-3 py-[9px] border border-border rounded-lg text-base text-text bg-white outline-none box-border"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <AuthInput
+          label="Ad Soyad"
+          icon="user"
+          type="text"
+          value={displayName}
+          onChange={e => setDisplayName(e.target.value)}
+          required
+          placeholder="Ali Veli"
+          autoComplete="name"
+        />
 
-        <div className="mb-4">
-          <label className="block mb-1.5 text-sm font-medium text-text">E-posta</label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-            placeholder="ornek@sirket.com"
-            className="w-full px-3 py-[9px] border border-border rounded-lg text-base text-text bg-white outline-none box-border"
-          />
-        </div>
+        <AuthInput
+          label="E-posta"
+          icon="mail"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+          placeholder="ornek@sirket.com"
+          autoComplete="email"
+        />
 
-        <div className="mb-6">
-          <label className="block mb-1.5 text-sm font-medium text-text">Şifre</label>
-          <input
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            placeholder="En az 8 karakter"
-            className="w-full px-3 py-[9px] border border-border rounded-lg text-base text-text bg-white outline-none box-border"
-          />
-        </div>
+        <AuthInput
+          label="Şifre"
+          icon="lock"
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+          placeholder="En az 8 karakter"
+          autoComplete="new-password"
+        />
 
-        <div className="mb-6">
-          <label className="flex items-start gap-2.5 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={termsAccepted}
-              onChange={e => setTermsAccepted(e.target.checked)}
-              required
-              className="mt-0.5 cursor-pointer"
-            />
-            <span className="text-sm text-textMuted">
-              <Link href="/kullanim-sartlari" target="_blank" className="text-primary no-underline hover:underline">
-                Kullanım Şartları
-              </Link>
-              {' ve '}
-              <Link href="/gizlilik-politikasi" target="_blank" className="text-primary no-underline hover:underline">
-                Gizlilik Politikası / KVKK Aydınlatma Metni
-              </Link>
-              &apos;ni okudum, kabul ediyorum.
-            </span>
-          </label>
-        </div>
+        <label className="flex items-start gap-2.5 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={e => setTermsAccepted(e.target.checked)}
+            required
+            className="mt-0.5 cursor-pointer"
+          />
+          <span className="text-sm text-textMuted">
+            <Link href="/kullanim-sartlari" target="_blank" className="text-primary no-underline hover:underline">
+              Kullanım Şartları
+            </Link>
+            {' ve '}
+            <Link href="/gizlilik-politikasi" target="_blank" className="text-primary no-underline hover:underline">
+              Gizlilik Politikası / KVKK Aydınlatma Metni
+            </Link>
+            &apos;ni okudum, kabul ediyorum.
+          </span>
+        </label>
 
         {error && (
-          <div className="mb-4 p-3 bg-dangerLight border border-red-300 rounded-md text-sm text-danger">
+          <div className="rounded-md border border-red-300 bg-dangerLight p-3 text-sm text-danger">
             {error}
           </div>
         )}
@@ -125,7 +121,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading || !termsAccepted}
-          className="w-full p-2.5 bg-primary text-white border-none rounded-lg text-base font-semibold cursor-pointer disabled:bg-textLight disabled:cursor-not-allowed"
+          className="mt-1 w-full cursor-pointer rounded-lg border-none bg-primary p-2.5 text-base font-semibold text-white transition-colors hover:bg-primaryHover disabled:cursor-not-allowed disabled:bg-textLight"
         >
           {loading ? 'Kayıt yapılıyor...' : 'Kayıt Ol'}
         </button>
@@ -133,7 +129,7 @@ export default function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-textMuted">
         Zaten hesabınız var mı?{' '}
-        <Link href="/auth/login" className="text-primary no-underline font-medium hover:underline">
+        <Link href="/auth/login" className="font-medium text-primary no-underline hover:underline">
           Giriş Yap
         </Link>
       </p>

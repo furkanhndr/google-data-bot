@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { AuthInput } from '@/components/auth/AuthInput'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -41,34 +42,46 @@ export default function ResetPasswordPage() {
 
   return (
     <>
-      <h1 className="mb-2 text-2xl font-bold text-text">Yeni Şifre Belirle</h1>
+      <h1 className="mb-2 font-[family-name:var(--font-heading)] text-2xl font-semibold text-text">
+        Yeni Şifre Belirle
+      </h1>
       <p className="mb-7 text-sm text-textMuted">
         Hesabın için yeni bir şifre gir.
       </p>
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-1.5 text-sm font-medium text-text">Yeni Şifre</label>
-          <input
-            type="password" value={password} onChange={e => setPassword(e.target.value)} required
-            placeholder="En az 8 karakter"
-            className="w-full px-3 py-[9px] border border-border rounded-lg text-base text-text bg-white outline-none box-border disabled:bg-bg"
-            disabled={!ready}
-          />
-        </div>
-        <div className="mb-6">
-          <label className="block mb-1.5 text-sm font-medium text-text">Yeni Şifre (Tekrar)</label>
-          <input
-            type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required
-            placeholder="••••••••"
-            className="w-full px-3 py-[9px] border border-border rounded-lg text-base text-text bg-white outline-none box-border disabled:bg-bg"
-            disabled={!ready}
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <AuthInput
+          label="Yeni Şifre"
+          icon="lock"
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+          placeholder="En az 8 karakter"
+          disabled={!ready}
+          autoComplete="new-password"
+        />
+        <AuthInput
+          label="Yeni Şifre (Tekrar)"
+          icon="lock"
+          type="password"
+          value={confirm}
+          onChange={e => setConfirm(e.target.value)}
+          required
+          placeholder="••••••••"
+          disabled={!ready}
+          autoComplete="new-password"
+        />
 
-        {error && <div className="mb-4 p-3 bg-dangerLight border border-red-300 rounded-md text-sm text-danger">{error}</div>}
+        {error && (
+          <div className="rounded-md border border-red-300 bg-dangerLight p-3 text-sm text-danger">{error}</div>
+        )}
 
-        <button type="submit" disabled={loading || !ready} className="w-full p-2.5 bg-primary text-white border-none rounded-lg text-base font-semibold cursor-pointer disabled:bg-textLight disabled:cursor-not-allowed">
+        <button
+          type="submit"
+          disabled={loading || !ready}
+          className="w-full cursor-pointer rounded-lg border-none bg-primary p-2.5 text-base font-semibold text-white transition-colors hover:bg-primaryHover disabled:cursor-not-allowed disabled:bg-textLight"
+        >
           {loading ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
         </button>
       </form>

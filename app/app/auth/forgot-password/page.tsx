@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { AuthInput } from '@/components/auth/AuthInput'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail]     = useState('')
@@ -33,12 +34,14 @@ export default function ForgotPasswordPage() {
   if (sent) {
     return (
       <>
-        <h1 className="mb-2 text-2xl font-bold text-text">E-postanı kontrol et</h1>
+        <h1 className="mb-2 font-[family-name:var(--font-heading)] text-2xl font-semibold text-text">
+          E-postanı kontrol et
+        </h1>
         <p className="mb-6 text-sm text-textMuted">
-          <strong>{email}</strong> adresine bir şifre sıfırlama bağlantısı gönderdik.
+          <strong className="text-text">{email}</strong> adresine bir şifre sıfırlama bağlantısı gönderdik.
           Bağlantı kısa süre içinde gelmezse spam klasörünü kontrol et.
         </p>
-        <Link href="/auth/login" className="text-sm text-primary no-underline font-medium hover:underline">
+        <Link href="/auth/login" className="text-sm font-medium text-primary no-underline hover:underline">
           ← Girişe dön
         </Link>
       </>
@@ -47,32 +50,40 @@ export default function ForgotPasswordPage() {
 
   return (
     <>
-      <h1 className="mb-2 text-2xl font-bold text-text">Şifremi Unuttum</h1>
+      <h1 className="mb-2 font-[family-name:var(--font-heading)] text-2xl font-semibold text-text">
+        Şifremi Unuttum
+      </h1>
       <p className="mb-7 text-sm text-textMuted">
         Hesabının e-postasını gir, sıfırlama bağlantısı gönderelim.
       </p>
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-6">
-          <label className="block mb-1.5 text-sm font-medium text-text">E-posta</label>
-          <input
-            type="email" value={email} onChange={e => setEmail(e.target.value)} required
-            placeholder="ornek@sirket.com"
-            className="w-full px-3 py-[9px] border border-border rounded-lg text-base text-text bg-white outline-none box-border"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <AuthInput
+          label="E-posta"
+          icon="mail"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+          placeholder="ornek@sirket.com"
+          autoComplete="email"
+        />
 
         {error && (
-          <div className="mb-4 p-3 bg-dangerLight border border-red-300 rounded-md text-sm text-danger">{error}</div>
+          <div className="rounded-md border border-red-300 bg-dangerLight p-3 text-sm text-danger">{error}</div>
         )}
 
-        <button type="submit" disabled={loading} className="w-full p-2.5 bg-primary text-white border-none rounded-lg text-base font-semibold cursor-pointer disabled:bg-textLight disabled:cursor-not-allowed">
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full cursor-pointer rounded-lg border-none bg-primary p-2.5 text-base font-semibold text-white transition-colors hover:bg-primaryHover disabled:cursor-not-allowed disabled:bg-textLight"
+        >
           {loading ? 'Gönderiliyor...' : 'Sıfırlama Bağlantısı Gönder'}
         </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-textMuted">
-        <Link href="/auth/login" className="text-primary no-underline font-medium hover:underline">
+        <Link href="/auth/login" className="font-medium text-primary no-underline hover:underline">
           ← Girişe dön
         </Link>
       </p>

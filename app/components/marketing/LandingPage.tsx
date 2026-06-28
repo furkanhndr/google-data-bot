@@ -708,6 +708,9 @@ export function LandingPage() {
             </span>
           </div>
           <nav className="flex items-center gap-5 text-xs text-slate-400">
+            <a href="mailto:support@vintotap.com" className="hover:text-white transition-colors duration-200">
+              Destek
+            </a>
             <Link href="/kullanim-sartlari" className="hover:text-white transition-colors duration-200">
               Kullanım Şartları
             </Link>
