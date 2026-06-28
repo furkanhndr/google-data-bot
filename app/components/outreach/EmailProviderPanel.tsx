@@ -60,9 +60,18 @@ export function EmailProviderPanel({ initial, fallbackEmail }: { initial: Initia
   return (
     <Card className="mb-4">
       <h2 className="mb-1 text-lg font-semibold text-text">E-posta Gönderim (SMTP)</h2>
-      <p className="mb-5 text-xs text-textMuted">
+      <p className="mb-3 text-xs text-textMuted">
         Lead'lere e-posta kendi SMTP sunucunuzdan gönderilir. Şifreniz şifreli saklanır, hiçbir zaman geri gösterilmez.
       </p>
+
+      <div className="mb-5 rounded-md border border-yellow-300 bg-warningLight p-3 text-xs text-warning">
+        <div className="font-semibold mb-1">⚖️ Yasal sorumluluk</div>
+        Gönderdiğiniz tüm ticari e-postalardan <strong>siz sorumlusunuz</strong>. Türkiye'de ticari
+        elektronik ileti göndermek için alıcının <strong>onayı (İYS/açık rıza)</strong> veya meşru bir
+        hukuki dayanak gerekir; KVKK ve 6563 sayılı kanuna uymak, mesajlarda kimliğinizi ve
+        <strong> çıkış (unsubscribe)</strong> imkânını belirtmek sizin yükümlülüğünüzdür. BusinessData
+        yalnızca aracı bir gönderim aracıdır; izinsiz/spam gönderimlerden doğacak sonuçlardan sorumlu değildir.
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         <Input label="SMTP Sunucu" value={host} onChange={e => setHost(e.target.value)} placeholder="smtp.gmail.com" required />

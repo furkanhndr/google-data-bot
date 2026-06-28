@@ -223,7 +223,18 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
   const [notes, setNotes] = useState('')
   const [events, setEvents] = useState<OutreachEvent[]>([])
   const [sending, setSending] = useState(false)
+  const [emailConsent, setEmailConsent] = useState(false)
   const { toast } = useToast()
+
+  // Remember the legal acknowledgement so the user accepts it once per browser.
+  useEffect(() => {
+    if (typeof window !== 'undefined') setEmailConsent(localStorage.getItem('outreach_email_consent') === '1')
+  }, [])
+
+  function setConsent(v: boolean) {
+    setEmailConsent(v)
+    if (typeof window !== 'undefined') localStorage.setItem('outreach_email_consent', v ? '1' : '0')
+  }
   const [eventsLoading, setEventsLoading] = useState(false)
 
   useEffect(() => {
@@ -355,6 +366,7 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
 
   async function sendEmailNow() {
     if (!selectedRow) return
+    if (!emailConsent) { toast('Göndermeden önce yasal onayı işaretleyin.', 'error'); return }
     setSending(true)
     const res = await fetch('/api/outreach/send', {
       method: 'POST',
@@ -591,6 +603,16 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
               </button>
             </div>
 
+            {channel === 'email' && (
+              <label className="flex items-start gap-2 mb-4 text-xs text-textMuted cursor-pointer">
+                <input type="checkbox" checked={emailConsent} onChange={e => setConsent(e.target.checked)} className="mt-0.5" />
+                <span>
+                  Bu kişiye e-posta göndermek için <strong>yasal dayanağım (onay/İYS/meşru menfaat)</strong> olduğunu,
+                  KVKK ve 6563 sayılı kanuna uyduğumu ve doğacak sorumluluğun bana ait olduğunu onaylıyorum.
+                </span>
+              </label>
+            )}
+
             <div className="flex flex-wrap justify-end gap-2">
               <Button variant="secondary" onClick={copyMessage}>{copied ? 'Kopyalandı' : 'Kopyala'}</Button>
               <Button
@@ -603,9 +625,9 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
               {channel === 'email' && (
                 <Button
                   loading={sending}
-                  disabled={!selectedRow.email}
+                  disabled={!selectedRow.email || !emailConsent}
                   onClick={sendEmailNow}
-                  title="SMTP ile gönder"
+                  title={emailConsent ? 'SMTP ile gönder' : 'Önce yasal onayı işaretleyin'}
                 >
                   E-posta Gönder
                 </Button>
