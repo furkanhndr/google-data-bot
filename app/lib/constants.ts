@@ -65,10 +65,8 @@ export const PLACES_TEXT_SEARCH_COST_PER_REQUEST_USD = Number(
   process.env.PLACES_TEXT_SEARCH_COST_PER_REQUEST_USD ?? '0.032'
 )
 
-export const PLAN_LIMITS = {
-  free:    { credits: 100,      maxResultsPerJob: PLACES_MAX_RESULTS, dailyJobs: 5 },
-  premium: { credits: Infinity, maxResultsPerJob: PLACES_MAX_RESULTS, dailyJobs: 50 },
-} as const
+// Plan limits (credits, daily job count, etc.) live in @/lib/plan — the single
+// source of truth — alongside the helpers that read them.
 
 // ── Scraping ─────────────────────────────────────────────────
 export const SCRAPE_BATCH_SIZE = 10
