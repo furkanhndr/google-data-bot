@@ -69,8 +69,8 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
             <Link key={item.href} href={item.href} className="no-underline" onClick={() => setDrawerOpen(false)}>
               <div className={`
                 flex items-center gap-2.5 px-5 py-2.5 border-l-[3px] transition-colors
-                ${active 
-                  ? 'bg-blue-600/25 border-blue-500 text-white font-semibold' 
+                ${active
+                  ? 'bg-blue-600/25 border-blue-500 text-white font-semibold'
                   : 'border-transparent text-gray-300 font-normal hover:bg-gray-700'
                 }
               `}>
@@ -80,6 +80,24 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
             </Link>
           )
         })}
+
+        {profile.role === 'admin' && (
+          <>
+            <div className="mx-5 my-2.5 border-t border-white/10" />
+            <Link href="/admin" className="no-underline" onClick={() => setDrawerOpen(false)}>
+              <div className={`
+                flex items-center gap-2.5 px-5 py-2.5 border-l-[3px] transition-colors
+                ${pathname.startsWith('/admin')
+                  ? 'bg-purple-600/25 border-purple-500 text-white font-semibold'
+                  : 'border-transparent text-gray-300 font-normal hover:bg-gray-700'
+                }
+              `}>
+                <span className="text-[15px]">🛠</span>
+                Yönetici Paneli
+              </div>
+            </Link>
+          </>
+        )}
       </nav>
 
       {/* Credits widget */}
