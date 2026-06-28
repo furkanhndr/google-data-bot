@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
+import { useToast } from '@/components/ui/Toast'
 import {
   buildMailtoUrl,
   buildWhatsAppUrl,
@@ -221,6 +222,8 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
   const [statusFilter, setStatusFilter] = useState<LeadOutreachStatus | 'all'>('all')
   const [notes, setNotes] = useState('')
   const [events, setEvents] = useState<OutreachEvent[]>([])
+  const [sending, setSending] = useState(false)
+  const { toast } = useToast()
   const [eventsLoading, setEventsLoading] = useState(false)
 
   useEffect(() => {
@@ -348,6 +351,30 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
       window.location.href = buildMailtoUrl(selectedRow.email, rendered.subject, rendered.body)
       logEvent('opened')
     }
+  }
+
+  async function sendEmailNow() {
+    if (!selectedRow) return
+    setSending(true)
+    const res = await fetch('/api/outreach/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        business_result_id: selectedRow.id,
+        subject: rendered.subject,
+        body: rendered.body,
+        template_id: selectedTemplate?.id ?? null,
+      }),
+    })
+    setSending(false)
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) { toast(data.error ?? 'Gönderim başarısız.', 'error'); return }
+    toast('E-posta gönderildi ✅', 'success')
+    setLeadStatuses(prev => ({
+      ...prev,
+      [selectedRow.id]: { ...(prev[selectedRow.id] ?? {}), status: 'sent' } as LeadOutreachState,
+    }))
+    loadEvents(selectedRow.id)
   }
 
   async function saveLeadStatus(status: LeadOutreachStatus, markContacted = false) {
@@ -564,14 +591,25 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
               </button>
             </div>
 
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
               <Button variant="secondary" onClick={copyMessage}>{copied ? 'Kopyalandı' : 'Kopyala'}</Button>
               <Button
+                variant="secondary"
                 onClick={() => { logEvent('prepared'); openNativeComposer() }}
                 disabled={channel === 'whatsapp' ? !selectedRow.phone : !selectedRow.email}
               >
                 {channel === 'whatsapp' ? 'WhatsApp’ta Aç' : 'E-posta Aç'}
               </Button>
+              {channel === 'email' && (
+                <Button
+                  loading={sending}
+                  disabled={!selectedRow.email}
+                  onClick={sendEmailNow}
+                  title="SMTP ile gönder"
+                >
+                  E-posta Gönder
+                </Button>
+              )}
             </div>
 
             <div className="mt-5 rounded-md border border-border bg-bg p-4">

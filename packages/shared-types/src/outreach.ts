@@ -26,6 +26,22 @@ export interface OutreachSettings {
   updated_at: string
 }
 
+// SMTP provider settings. The password is stored encrypted server-side and is
+// never returned to the client — the API exposes only `configured`.
+export interface EmailProviderSettings {
+  id: string
+  user_id: string
+  smtp_host: string
+  smtp_port: number
+  smtp_secure: boolean
+  smtp_user: string | null
+  from_email: string
+  from_name: string | null
+  configured: boolean   // whether a password is stored
+  created_at: string
+  updated_at: string
+}
+
 export interface MessageTemplate {
   id: string
   user_id: string

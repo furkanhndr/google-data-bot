@@ -10,11 +10,13 @@ export const PLAN_LIMITS = {
     credits: 100,
     maxResultsPerJob: PLACES_MAX_RESULTS,
     dailyJobs: 5,
+    dailyEmails: 20,
   },
   premium: {
     credits: Infinity,
     maxResultsPerJob: PLACES_MAX_RESULTS,
     dailyJobs: 50,
+    dailyEmails: 200,
   },
 } as const
 
@@ -28,6 +30,10 @@ export function getPlanMaxResults(plan: UserPlan): number {
 
 export function getPlanDailyJobLimit(plan: UserPlan): number {
   return PLAN_LIMITS[plan]?.dailyJobs ?? PLAN_LIMITS.free.dailyJobs
+}
+
+export function getPlanDailyEmailLimit(plan: UserPlan): number {
+  return PLAN_LIMITS[plan]?.dailyEmails ?? PLAN_LIMITS.free.dailyEmails
 }
 
 export function formatPlanCreditsTotal(plan: UserPlan, storedCreditsTotal: number): string {

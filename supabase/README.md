@@ -15,6 +15,7 @@ Supabase Dashboard → SQL Editor'da aşağıdaki sırayla çalıştır:
 | 7 | `migrations/20240001_007_realtime.sql` | Realtime publication (canlı sonuç + bildirim) |
 | 8 | `migrations/20240001_008_outreach.sql` | WhatsApp/e-posta şablonları, gönderim ayarları, outreach geçmişi |
 | 9 | `migrations/20240001_009_outreach_status_events.sql` | Manuel lead durum değişikliklerini outreach geçmişine ekleme |
+| 10 | `migrations/20240001_010_email_provider.sql` | Kullanıcı bazlı SMTP ayarları (şifreli parola) — outreach e-posta gönderimi |
 
 ## Storage Bucket'larını Manuel Oluşturma
 

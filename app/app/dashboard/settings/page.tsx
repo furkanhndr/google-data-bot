@@ -5,6 +5,7 @@ import { ProfileSettings } from '@/components/settings/ProfileSettings'
 import { PasswordSettings } from '@/components/settings/PasswordSettings'
 import { DangerZone } from '@/components/settings/DangerZone'
 import { OutreachSettingsPanel } from '@/components/outreach/OutreachSettingsPanel'
+import { EmailProviderPanel } from '@/components/outreach/EmailProviderPanel'
 import { MessageTemplatesPanel } from '@/components/outreach/MessageTemplatesPanel'
 import { SettingsTabs } from '@/components/settings/SettingsTabs'
 import type { MessageTemplate, OutreachSettings } from '@googlebusinessdata/shared-types'
@@ -29,7 +30,7 @@ export default async function SettingsPage() {
     .eq('id', user!.id)
     .single()
 
-  const [{ data: outreachSettings }, { data: templates }] = await Promise.all([
+  const [{ data: outreachSettings }, { data: templates }, { data: emailCfg }] = await Promise.all([
     supabase
       .from('outreach_settings')
       .select('*')
@@ -40,7 +41,24 @@ export default async function SettingsPage() {
       .select('*')
       .eq('user_id', user!.id)
       .order('created_at', { ascending: true }),
+    supabase
+      .from('email_provider_settings')
+      .select('smtp_host, smtp_port, smtp_secure, smtp_user, from_email, from_name, smtp_pass_encrypted')
+      .eq('user_id', user!.id)
+      .maybeSingle(),
   ])
+
+  const emailInitial = emailCfg
+    ? {
+        smtp_host: emailCfg.smtp_host,
+        smtp_port: emailCfg.smtp_port,
+        smtp_secure: emailCfg.smtp_secure,
+        smtp_user: emailCfg.smtp_user,
+        from_email: emailCfg.from_email,
+        from_name: emailCfg.from_name,
+        configured: !!emailCfg.smtp_pass_encrypted,
+      }
+    : null
 
   const creditsPercent = profile
     ? profile.plan === 'premium'
@@ -73,6 +91,7 @@ export default async function SettingsPage() {
               fallbackEmail={user?.email ?? ''}
               fallbackName={profile?.display_name ?? ''}
             />
+            <EmailProviderPanel initial={emailInitial} fallbackEmail={user?.email ?? ''} />
             <MessageTemplatesPanel initialTemplates={(templates ?? []) as MessageTemplate[]} />
           </>
         )}
