@@ -15,6 +15,8 @@ import type {
   LeadOutreachStatus,
   MessageTemplate,
   OutreachChannel,
+  OutreachEvent,
+  OutreachEventType,
   OutreachSettings,
 } from '@googlebusinessdata/shared-types'
 
@@ -58,6 +60,15 @@ const statusClasses: Record<LeadOutreachStatus, string> = {
   replied: 'bg-green-50 text-green-700',
   not_interested: 'bg-red-50 text-danger',
   customer: 'bg-green-50 text-success',
+}
+
+const eventLabels: Record<OutreachEventType, string> = {
+  prepared: 'Taslak hazırlandı',
+  copied: 'Mesaj kopyalandı',
+  opened: 'Gönderim ekranı açıldı',
+  sent: 'Gönderildi',
+  failed: 'Hata aldı',
+  status_changed: 'Durum güncellendi',
 }
 
 // Small inline button that copies a value to the clipboard with brief feedback.
@@ -209,6 +220,8 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
   const [leadStatuses, setLeadStatuses] = useState<Record<string, LeadOutreachState>>({})
   const [statusFilter, setStatusFilter] = useState<LeadOutreachStatus | 'all'>('all')
   const [notes, setNotes] = useState('')
+  const [events, setEvents] = useState<OutreachEvent[]>([])
+  const [eventsLoading, setEventsLoading] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -261,6 +274,21 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
     setSelectedTemplateId(defaultTemplate?.id ?? '')
     setNotes(leadStatuses[row.id]?.notes ?? '')
     setCopied(false)
+    loadEvents(row.id)
+  }
+
+  async function loadEvents(businessResultId: string) {
+    setEvents([])
+    setEventsLoading(true)
+    try {
+      const res = await fetch(`/api/outreach/events?business_result_id=${encodeURIComponent(businessResultId)}`)
+      const data = await res.json()
+      setEvents(res.ok ? data.events ?? [] : [])
+    } catch {
+      setEvents([])
+    } finally {
+      setEventsLoading(false)
+    }
   }
 
   function handleStatusFilter(next: LeadOutreachStatus | 'all') {
@@ -271,6 +299,7 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
   const channelTemplates = templates.filter(t => t.channel === channel && t.is_active)
   const selectedTemplate = channelTemplates.find(t => t.id === selectedTemplateId)
   const fallbackTemplate = getDefaultTemplate(channel)
+  const templateNames = useMemo(() => new Map(templates.map(t => [t.id, t.name])), [templates])
 
   const rendered = useMemo(() => {
     if (!selectedRow) return { subject: '', body: '' }
@@ -284,7 +313,7 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
 
   async function logEvent(eventType: 'prepared' | 'copied' | 'opened') {
     if (!selectedRow) return
-    await fetch('/api/outreach/events', {
+    const res = await fetch('/api/outreach/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -296,6 +325,7 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
         body: rendered.body,
       }),
     }).catch(() => {})
+    if (res?.ok) loadEvents(selectedRow.id)
   }
 
   async function copyMessage() {
@@ -337,7 +367,17 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
     const data = await res.json()
     if (res.ok && data.status) {
       setLeadStatuses(prev => ({ ...prev, [selectedRow.id]: data.status }))
+      loadEvents(selectedRow.id)
     }
+  }
+
+  function formatEventTime(value: string) {
+    return new Intl.DateTimeFormat('tr-TR', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(value))
   }
 
   return (
@@ -428,7 +468,7 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
         open={Boolean(selectedRow)}
         onClose={() => setSelectedRow(null)}
         title={channel === 'whatsapp' ? 'WhatsApp Mesajı' : 'E-posta Taslağı'}
-        width={480}
+        width={640}
       >
         {selectedRow && (
           <div>
@@ -532,6 +572,44 @@ export function ResultsTable({ results, total }: ResultsTableProps) {
               >
                 {channel === 'whatsapp' ? 'WhatsApp’ta Aç' : 'E-posta Aç'}
               </Button>
+            </div>
+
+            <div className="mt-5 rounded-md border border-border bg-bg p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="m-0 text-sm font-semibold text-text">Gönderim Geçmişi</h3>
+                <span className="text-xs text-textMuted">{events.length > 0 ? `Son ${events.length} kayıt` : ''}</span>
+              </div>
+              {eventsLoading ? (
+                <div className="text-sm text-textMuted">Geçmiş yükleniyor...</div>
+              ) : events.length === 0 ? (
+                <div className="text-sm text-textMuted">Bu lead için henüz geçmiş yok.</div>
+              ) : (
+                <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
+                  {events.map(event => (
+                    <div key={event.id} className="rounded-md border border-border bg-white p-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-medium text-text">
+                            {eventLabels[event.event_type]}
+                          </div>
+                          <div className="mt-0.5 text-xs text-textMuted">
+                            {event.channel === 'whatsapp' ? 'WhatsApp' : 'E-posta'}
+                            {event.subject && event.event_type === 'status_changed' ? ` · ${statusLabels[event.subject as LeadOutreachStatus] ?? event.subject}` : ''}
+                            {event.template_id ? ` · ${templateNames.get(event.template_id) ?? 'Şablon'}` : ''}
+                          </div>
+                        </div>
+                        <span className="whitespace-nowrap text-xs text-textMuted">{formatEventTime(event.created_at)}</span>
+                      </div>
+                      {event.error_message && (
+                        <div className="mt-2 text-xs text-danger">{event.error_message}</div>
+                      )}
+                      {event.body && event.event_type === 'status_changed' && (
+                        <div className="mt-2 line-clamp-2 text-xs text-textMuted">{event.body}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -179,6 +179,9 @@ Her lead için:
 - Hata oldu mu?
 - Yanıt geldi mi?
 
+Durum: İlk lead geçmişi ekranı eklendi. Kopyalama/açma/gönderildi ve manuel
+durum değişiklikleri lead modalında geçmiş olarak listeleniyor.
+
 ## Veri Modeli Taslağı
 
 ### `outreach_settings`

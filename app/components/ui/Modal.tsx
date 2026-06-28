@@ -14,6 +14,7 @@ interface ModalProps {
 const widthClasses: Record<number, string> = {
   460: 'max-w-[460px]',
   480: 'max-w-[480px]',
+  640: 'max-w-[640px]',
 }
 
 export function Modal({ open, onClose, title, children, width = 480 }: ModalProps) {

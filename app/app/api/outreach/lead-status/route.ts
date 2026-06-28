@@ -76,6 +76,19 @@ export async function PUT(request: NextRequest) {
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  if (lastChannel && status !== 'new') {
+    await supabase.from('outreach_events').insert({
+      user_id: user.id,
+      business_result_id: business.id,
+      template_id: clean(body.last_template_id),
+      channel: lastChannel,
+      event_type: status === 'sent' ? 'sent' : 'status_changed',
+      subject: status,
+      body: clean(body.notes),
+    })
+  }
+
   return NextResponse.json({ status: data })
 }
 

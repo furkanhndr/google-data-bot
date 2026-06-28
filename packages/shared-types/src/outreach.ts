@@ -10,7 +10,7 @@ export type LeadOutreachStatus =
   | 'not_interested'
   | 'customer'
 
-export type OutreachEventType = 'prepared' | 'copied' | 'opened' | 'sent' | 'failed'
+export type OutreachEventType = 'prepared' | 'copied' | 'opened' | 'sent' | 'failed' | 'status_changed'
 
 export interface OutreachSettings {
   id: string
