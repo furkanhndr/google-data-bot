@@ -12,6 +12,7 @@ export default function RegisterPage() {
   const [password, setPassword]       = useState('')
   const [error, setError]             = useState<string | null>(null)
   const [loading, setLoading]         = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -19,6 +20,10 @@ export default function RegisterPage() {
 
     if (password.length < 8) {
       setError('Şifre en az 8 karakter olmalıdır.')
+      return
+    }
+    if (!termsAccepted) {
+      setError('Devam etmek için Kullanım Şartları ve Gizlilik Politikası\'nı kabul etmelisiniz.')
       return
     }
 
@@ -89,6 +94,28 @@ export default function RegisterPage() {
           />
         </div>
 
+        <div className="mb-6">
+          <label className="flex items-start gap-2.5 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={e => setTermsAccepted(e.target.checked)}
+              required
+              className="mt-0.5 cursor-pointer"
+            />
+            <span className="text-sm text-textMuted">
+              <Link href="/kullanim-sartlari" target="_blank" className="text-primary no-underline hover:underline">
+                Kullanım Şartları
+              </Link>
+              {' ve '}
+              <Link href="/gizlilik-politikasi" target="_blank" className="text-primary no-underline hover:underline">
+                Gizlilik Politikası / KVKK Aydınlatma Metni
+              </Link>
+              &apos;ni okudum, kabul ediyorum.
+            </span>
+          </label>
+        </div>
+
         {error && (
           <div className="mb-4 p-3 bg-dangerLight border border-red-300 rounded-md text-sm text-danger">
             {error}
@@ -97,7 +124,7 @@ export default function RegisterPage() {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !termsAccepted}
           className="w-full p-2.5 bg-primary text-white border-none rounded-lg text-base font-semibold cursor-pointer disabled:bg-textLight disabled:cursor-not-allowed"
         >
           {loading ? 'Kayıt yapılıyor...' : 'Kayıt Ol'}

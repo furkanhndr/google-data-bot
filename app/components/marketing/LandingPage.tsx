@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
+import { PREMIUM_PRICE_TRY } from '@/lib/constants'
 
 function useReveal<T extends HTMLElement>() {
   const ref = useRef<T | null>(null)
@@ -588,7 +589,7 @@ export function LandingPage() {
               <h2 className="font-[family-name:var(--font-heading)] text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                 Basit, şeffaf fiyatlandırma
               </h2>
-              <p className="mt-4 text-base text-slate-400 sm:text-lg">İstediğin an yükselt veya düşür.</p>
+              <p className="mt-4 text-base text-slate-400 sm:text-lg">Tek seferlik ödeme, otomatik yenileme yok — istediğin zaman tekrar satın al.</p>
             </Reveal>
 
             <div className="mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-2">
@@ -626,7 +627,8 @@ export function LandingPage() {
                   <h3 className="font-[family-name:var(--font-heading)] text-xl font-medium text-white">Pro</h3>
                   <p className="mt-1 text-sm text-slate-400">Aktif satış ekipleri için</p>
                   <p className="mt-6 font-[family-name:var(--font-heading)] text-4xl font-semibold text-white">
-                    Aylık plan
+                    {PREMIUM_PRICE_TRY.toLocaleString('tr-TR')} ₺
+                    <span className="text-base font-normal text-slate-400"> / 30 gün</span>
                   </p>
                   <ul className="mt-6 space-y-3 text-sm text-slate-300">
                     {[
@@ -705,6 +707,14 @@ export function LandingPage() {
               Google Business Data
             </span>
           </div>
+          <nav className="flex items-center gap-5 text-xs text-slate-400">
+            <Link href="/kullanim-sartlari" className="hover:text-white transition-colors duration-200">
+              Kullanım Şartları
+            </Link>
+            <Link href="/gizlilik-politikasi" className="hover:text-white transition-colors duration-200">
+              Gizlilik Politikası
+            </Link>
+          </nav>
           <p className="text-xs text-slate-500">
             © {new Date().getFullYear()} Google Business Data. Tüm hakları saklıdır.
           </p>
