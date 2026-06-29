@@ -18,9 +18,32 @@ const dmSans = DM_Sans({
   display: 'swap',
 })
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+const TITLE = 'Google Business Data — Google Maps\'ten Satışa Hazır Lead Çıkar'
+const DESCRIPTION =
+  'Şehir ve kategori seç, binlerce işletmeyi saniyeler içinde tara, filtrele ve kişiselleştirilmiş WhatsApp/e-posta mesajlarıyla satış sürecini tek panelden yönet.'
+
 export const metadata: Metadata = {
-  title: 'Google Business Data',
-  description: 'Google Maps business data scraping platform',
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: TITLE,
+    template: '%s — Google Business Data',
+  },
+  description: DESCRIPTION,
+  keywords: ['google maps veri', 'lead bulma', 'işletme verisi', 'whatsapp pazarlama', 'b2b lead generation'],
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: APP_URL,
+    siteName: 'Google Business Data',
+    locale: 'tr_TR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 }
 
 export const viewport: Viewport = {
